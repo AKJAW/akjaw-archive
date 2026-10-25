@@ -45,8 +45,6 @@
     <link rel="icon" href="../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
     <link rel="canonical" href="https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/">
     <meta name="referrer" content="no-referrer-when-downgrade">
-    <link rel="amphtml" href="amp/">
-    
     <meta property="og:site_name" content="AKJAW">
     <meta property="og:type" content="article">
     <meta property="og:title" content="Kotlin Multiplatform GitHub Actions CI Verification using Labels">
@@ -113,8 +111,6 @@
     "mainEntityOfPage": "https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/"
 }
     </script>
-
-    <meta name="generator" content="Ghost 5.82">
     <style id="gh-members-styles">.gh-post-upgrade-cta-content,
 .gh-post-upgrade-cta {
     display: flex;
@@ -370,7 +366,7 @@
                     </div>
                     <div class="featured-image-caption text-center"></div>
                     <div class="post-content">
-                        <p>In this article, I'll show how to set up a Continuous Integration for a Kotlin Multiplatform repository. This CI will verify that the code changes don't break the main branch. The tool used for this is <a href="https://github.com/features/actions?ref=akjaw.com">GitHub Actions</a> which I use for every personal project because it is integrated with GitHub, and it is free for open source projects.</p><p>The CI verification consists of building the project and running tests both on PRs and on the main branch. However, depending on what label is selected for the PR only selected targets will be run, which saves time and costs (for paid plans).</p><p>The repository (which includes an Android, Desktop and iOS target) used in this article is available here:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/AKJAW/kotlin-multiplatform-github-actions?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - AKJAW/kotlin-multiplatform-github-actions</div><div class="kg-bookmark-description">Contribute to AKJAW/kotlin-multiplatform-github-actions development by creating an account on GitHub.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://github.com/fluidicon.png" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">AKJAW</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://opengraph.githubassets.com/2376ea82e2c5b5fc444f881eb6b4be2441c9775bb2d8952c812cb53a8337c6ae/AKJAW/kotlin-multiplatform-github-actions" alt=""></div></a></figure><p>Keep in mind that this article shows a <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">version of the repository which contains boilerplate</a>. How to remove this boilerplate is the topic of my <a href="../github-actions-reducing-duplication-boilerplate/">other article</a>.</p><h3 id="why-is-such-verification-needed">Why is such verification needed?</h3><p>Such a Continuous Integration will give us confidence, that changes made in the project don't break anything. It offloads the verification to an automated process, which doesn't forget and runs with little manual input.</p><p>If you'd like to fully automate this verification, checkout out my follow-up article on setting up <a href="../kotlin-multiplatform-gha-automated-labels/">automated labels</a>.</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text">Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the "main" branch by mistake.</div></div><h2 id="steps">Steps</h2><p>Before delving into the details, I just want to show the steps which will be used in the workflow. Every job contains the same set-up steps, so they will be omitted for brevity in the examples, the full code is available in the <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">repository</a>.</p><figure class="kg-card kg-code-card"><pre><code class="language-yaml">steps:
+                        <p>In this article, I'll show how to set up a Continuous Integration for a Kotlin Multiplatform repository. This CI will verify that the code changes don't break the main branch. The tool used for this is <a href="https://github.com/features/actions?ref=akjaw.com">GitHub Actions</a> which I use for every personal project because it is integrated with GitHub, and it is free for open source projects.</p><p>The CI verification consists of building the project and running tests both on PRs and on the main branch. However, depending on what label is selected for the PR only selected targets will be run, which saves time and costs (for paid plans).</p><p>The repository (which includes an Android, Desktop and iOS target) used in this article is available here:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/AKJAW/kotlin-multiplatform-github-actions?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - AKJAW/kotlin-multiplatform-github-actions</div><div class="kg-bookmark-description">Contribute to AKJAW/kotlin-multiplatform-github-actions development by creating an account on GitHub.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="/content/images/bookmarks/b5e52454b813a83d.png" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">AKJAW</span></div></div><div class="kg-bookmark-thumbnail"><img src="/content/images/bookmarks/4b8a2719906184de.png" alt=""></div></a></figure><p>Keep in mind that this article shows a <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">version of the repository which contains boilerplate</a>. How to remove this boilerplate is the topic of my <a href="../github-actions-reducing-duplication-boilerplate/">other article</a>.</p><h3 id="why-is-such-verification-needed">Why is such verification needed?</h3><p>Such a Continuous Integration will give us confidence, that changes made in the project don't break anything. It offloads the verification to an automated process, which doesn't forget and runs with little manual input.</p><p>If you'd like to fully automate this verification, checkout out my follow-up article on setting up <a href="../kotlin-multiplatform-gha-automated-labels/">automated labels</a>.</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text">Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the "main" branch by mistake.</div></div><h2 id="steps">Steps</h2><p>Before delving into the details, I just want to show the steps which will be used in the workflow. Every job contains the same set-up steps, so they will be omitted for brevity in the examples, the full code is available in the <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">repository</a>.</p><figure class="kg-card kg-code-card"><pre><code class="language-yaml">steps:
   - uses: actions/checkout@v3
 
   - uses: actions/setup-java@v3
@@ -658,7 +654,7 @@ concurrency:
         <nav>
             <ul class="no-style-list">
                 <li class="nav-link"><a href="../about-me/">About me</a></li>
-                <li class="nav-link"><a href="/contact-me/">Contact Me</a></li>
+                <li class="nav-link"><a href="/about-me/">Contact Me</a></li>
             </ul>
         </nav>
     </div>
@@ -681,7 +677,7 @@ concurrency:
         </div>
         <div class="footer-bottom flex justify-space-between">
             <div class="copyright">
-    &copy; 2026 <a href="../">AKJAW</a> - All right Reserved. Published with <a href="https://ghost.org?via=biswajit48">Ghost</a>
+    &copy; 2026 <a href="../">AKJAW</a> - All rights reserved.
 </div>        </div>
     </div>
 </footer>		</div>
