@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)</title>
+
+    <meta name="description" content="Automated tests are an integral part of developing software, they help catch bugs before they reach the users and save developers time by cutting down manual testing.">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)">
+    <meta property="og:description" content="Automated tests are an integral part of developing software, they help catch bugs before they reach the users and save developers time by cutting down manual testing.">
+    <meta property="og:url" content="https://akjaw.com/testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2023/04/kotlin-multiplatform-testing-updated-4.png">
+    <meta property="article:published_time" content="2023-04-15T06:00:00.000Z">
+    <meta property="article:modified_time" content="2023-04-23T08:48:25.000Z">
+    <meta property="article:tag" content="Testing">
+    <meta property="article:tag" content="Multiplatform">
+    <meta property="article:tag" content="Kotlin">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)">
+    <meta name="twitter:description" content="Automated tests are an integral part of developing software, they help catch bugs before they reach the users and save developers time by cutting down manual testing.">
+    <meta name="twitter:url" content="https://akjaw.com/testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2023/04/kotlin-multiplatform-testing-updated-4.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Testing, Multiplatform, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)",
+    "url": "https://akjaw.com/testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/",
+    "datePublished": "2023-04-15T06:00:00.000Z",
+    "dateModified": "2023-04-23T08:48:25.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2023/04/kotlin-multiplatform-testing-updated-4.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Testing, Multiplatform, Kotlin",
+    "description": "Automated tests are an integral part of developing software, they help catch bugs before they reach the users and save developers time by cutting down manual testing.",
+    "mainEntityOfPage": "https://akjaw.com/testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2023-04-15">15 Apr 2023</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2023/04/kotlin-multiplatform-testing-updated-4.png" width="600" height="340" layout="responsive" 
+                alt="Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <div class="kg-card kg-callout-card kg-callout-card-red"><div class="kg-callout-text">This is the new and improved version of this article, the previous one with the is still available <a href="../../old/old-testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">here</a>.</div></div><p>The main focus of Kotlin Multiplatform (KMP) is to avoid duplicating domain logic on different platforms. You write it once and reuse it on different targets.</p><p>If the shared code is broken, then all its platforms will work incorrectly and in my opinion, the best way to ensure that something works correctly is to write a <a href="../../5-beginner-testing-mistakes-i-noticed-while-working-with-less-experienced-developers/">tests covering all edge cases</a>. </p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">Because the KMP code base is the heart of multiple platforms, it's important that it contains as few bugs as possible. </div></div><p>In this article, I'll share my experience on writing tests for Kotlin Multiplatform, along with my strategy for speeding up development using tests. At <a href="https://www.footballco.com/?ref=akjaw.com">FootballCo</a> we use this strategy for our app, and we see that it helps our development cycle.</p><p>Even though the article focuses on Kotlin Multiplatform, a lot of the principles can also be applied to plain Kotlin applications or any other type of applications for that matter. Before starting, let me ask this question:</p><h3 id="why-bother-with-testing-at-all">Why bother with testing at all?</h3><p>Some engineers see tests as a waste of time, let me give some examples to change their mind.</p><ul><li><strong>Tests provide a fast feedback loop</strong>, after a couple of seconds you know if something works, or it doesn't. Verification through the UI requires building the whole app, navigating to the correct screen and performing the action. Which you can image, takes a lot more time.</li><li><strong>It's easier to catch edge cases looking at the code</strong>, a lot of the times the UI might not reflect all possible cases that might happen.</li><li>Sometimes it's hard to set-up the app in the correct state for testing (e.g. network timeout, receiving a socket). It might be possible, but <strong>setting up the correct state in tests is much faster and easier</strong>.</li><li><strong>A well written test suite is a safety net before the app is released</strong>. With a good CI set-up, regressions / bugs don't even reach the main branch because they are caught on PRs.</li><li><strong>Tests are built in documentation</strong>, which needs to reflect the actual implementation of the app. If it isn't updated, then the tests will fail.</li></ul><h2 id="the-kotlin-multiplatform-testing-ecosystem">The Kotlin Multiplatform testing ecosystem</h2><h3 id="testing-framework">Testing Framework</h3><p>Compared to the JVM, the Kotlin Multiplatform ecosystem is still relatively young. JUnit can only be used on JVM platforms, other platforms depend on the Kotlin standard library testing framework.</p><p>An alternative way for testing Kotlin Multiplatform code would be to use a different testing framework like <a href="https://kotest.io/docs/framework/framework.html?ref=akjaw.com">Kotest</a>. I don't have much experience using it, however I found it to be less reliable than writing tests using the standard testing framework (kotlin.test). For example: I was unable to run a singular test case (a function) through the IDE.</p><p>The standard testing library does lack some cool JUnit 5 features like parameterized tests or nesting, however it is possible to add them with some additional boilerplate:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../../kotlin-multiplatform-parameterized-tests-and-grouping/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Multiplatform Parameterized Tests and Grouping Using The Standard Kotlin Testing Framework</div><div class="kg-bookmark-description">Keeping Kotlin Multiplatform tests clean while using the standard kotlin.test framework</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"></div></a></figure><h3 id="assertions">Assertions</h3><p>Kotest also has a great <a href="https://kotest.io/docs/assertions/assertions.html?ref=akjaw.com">assertion library</a> in addition to the testing framework, which works flawlessly and can be used alongside the Kotlin standard library testing framework. Another library is <a href="https://github.com/robstoll/atrium?ref=akjaw.com">Atrium</a>, however it <a href="https://github.com/robstoll/atrium/issues/450?ref=akjaw.com">doesn't support Kotlin / Native</a>.</p><h3 id="mocking">Mocking</h3><p>For a long time, Kotlin Multiplatform did not have a mocking framework, things seem to have changed because <a href="https://github.com/mockk/mockk?ref=akjaw.com">Mockk</a> now supports Kotlin Multiplatform. However, there still might be <a href="https://github.com/mockk/mockk/issues/58?ref=akjaw.com">issues</a> on the Kotlin / Native side. An alternative to using a mocking framework is writing the mock or any other test double by hand, which will be explained in more detail in the next section.</p><p>Mocking is prevalent in tests that treat a single class as a unit, so let's touch on what can be defined as a unit before diving into the Kotlin Multiplatform testing strategy.</p><div class="kg-card kg-callout-card kg-callout-card-red"><div class="kg-callout-emoji">💬</div><div class="kg-callout-text">The <strong>mock</strong> keyword is overloaded and misused in a lot of places. I won't get into the reasons why, but if you're interested in learning more about it, take a look at the article below</div></div><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://martinfowler.com/articles/mocksArentStubs.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Mocks Aren’t Stubs</div><div class="kg-bookmark-description">Explaining the difference between Mock Objects and Stubs (together with other forms of Test Double). Also the difference between classical and mockist styles of unit testing.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">martinfowler.com</span><span class="kg-bookmark-publisher">Martin Fowler</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://martinfowler.com/logo-sq.png" alt="" width="144" height="144" layout="fixed"></amp-img></div></a></figure><h2 id="definition-of-a-unit">Definition of a Unit</h2><h3 id="one-unit-one-class">One unit, one class</h3><p>On Android, a unit is usually considered one class where all of its dependencies are <strong>mocked</strong>, probably using a framework like <a href="https://site.mockito.org/?ref=akjaw.com">Mockito</a> or <a href="https://mockk.io/?ref=akjaw.com">Mockk</a>. These frameworks are really easy to use, however they can be, easily abused, <a href="../../testing-mistakes-part-2/">which leads to brittle tests</a> that are coupled to the implementation details of the system under test. The upside is that, these types of unit tests are the easiest to write and read (Given that the number of mock logic is not that high).</p><p>Another benefit is that all the internal dependencies API (class names, function signature etc.) are more refined because they are used inside the tests (e.g. for setting up or verification) through <strong>mocks</strong>. The downside of this is that the these mocks often make refactoring harder, since changing implementation details (like for example extracting a class) will most likely break the test (because the extracted class needs to be mocked), even though the behavior of the feature did not change.</p><p>These types of tests work in isolation, which only verify that one unit (in this case, a class) works correctly. In order to verify that a group of units behave correctly together, there is a need for additional integration tests.</p><h3 id="one-unit-multiple-classes">One unit, multiple classes</h3><p>An alternative way of thinking about a unit could be a cohesive group of classes for a given feature. These tests try to use real dependencies instead of <strong>mocks</strong>, however <em>awkward, complex </em>or<em> boundary dependencies</em> (e.g. networks, persistence etc.) or are still replaced with a test double (usually written by hand instead of <strong>mocked</strong> by a framework).</p><p>The most frequent test doubles are Fakes, which resemble the real implementation but in a simpler form to allow testing (e.g. replacing a real database with an in-memory one). </p><p>There are also Stubs which are set-up before the <a href="../../5-beginner-testing-mistakes-i-noticed-while-working-with-less-experienced-developers/">action (AAA)</a> allowing the system under test to use predefined values (e.g. instead of returning system time, a predefined time value is returned). </p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">Having a <a href="../../modularizing-a-kotlin-multiplatform-mobile-project/">modularized project</a> allows for creating a "core-test" module which contains all public Test Doubles. Thanks to this, they can be re-used across all other modules without having to duplicate implementations</div></div><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://martinfowler.com/bliki/TestDouble.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">bliki: TestDouble</div><div class="kg-bookmark-description">Test Double is generic term for fakes, mocks, stubs, dummies and spies.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">martinfowler.com</span><span class="kg-bookmark-publisher">Martin Fowler</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://martinfowler.com/logo-sq.png" alt="" width="144" height="144" layout="fixed"></amp-img></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://medium.com/@june.pravin/mocking-is-not-practical-use-fakes-e30cc6eaaf4e?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Mocking is not practical — Use fakes</div><div class="kg-bookmark-description">This article talks about the benefits fakes provide over mocks in testing software. Fakes lead to better API and readable/robust tests.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">Medium</span><span class="kg-bookmark-publisher">Pravin Sonawane</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://miro.medium.com/max/1200/1*4qqr5y8GshK987Dvm7DgEA.jpeg" alt="" width="1200" height="1800" layout="responsive"></amp-img></div></a></figure><h2 id="my-strategy-for-testing-kotlin-multiplatform">My strategy for testing Kotlin Multiplatform</h2><p>Because mocking the Kotlin Multiplatform is far from perfect, I went the path of writing test doubles by hand. The problem with this is that if we wanted to write every Kotlin Multiplatform unit test like on Android (unit == class). We would be forced to create interfaces for every class along with a test double for it. Which would add unnecessary complexity just for testing purposes.</p><p>This is why I decided for the most part to treat a unit as a feature / behavior (group of classes). This way, there are less test doubles involved, and the system is tested in a more "production" like setting.</p><p>Depending on the complexity, the tests might become integration tests rather than unit tests, but in the grand scheme of things it's not that important as long as the system is properly tested.</p><h3 id="the-system-under-test">The system under test</h3><p>Most of the time, the system under test would be the public domain class that the Kotlin Multiplatform module exposes or maybe some other complex class which delegates to other classes. </p><p>If we had a feature that allowed the user to input a keyword and get a search result based on that keyword, the Contract / API could have the following signature:</p><pre><code class="language-kotlin">fun performSearch(input: String): List&lt;String&gt;</code></pre><p>This could be a function of an interface, a use case or anything else, the point is that this class has some complex logic.</p><p>Tests for this feature could look like this:</p><pre><code class="language-Kotlin">class SuccesfulSearchTest</code></pre><pre><code class="language-kotlin">class NetworkErrorSearchTest</code></pre><pre><code class="language-kotlin">class InvalidKeywordSearchTest</code></pre><p>Each test class exercise a different path that the system could take. In this case, one for a happy path, and two for unhappy paths. They could only focus the domain layer where the network API is faked, or they could also include the data layer where the real network layer is used but mocked somehow (e.g. <a href="../../using-ktor-client-mock-engine-for-integration-and-ui-tests/">Ktor MockEngine</a>, <a href="../../kotlin-multiplatform-testing-sqldelight-integration-ios-android/">SQLDelight In-Memory database</a>, <a href="../../using-apollo-kotlin-data-builders-for-testing/">GraphQL Mock Interceptor</a>). </p><p>The keyword validation might contain a lot of edges which may be hard to test through the <strong>InvalidKeywordSearchTest</strong> which could only focus on the domain aspects of what happens on invalid keywords. All the edge cases could be tested in a separate class:</p><pre><code class="language-kotlin">class KeywordValidatorTest {
+
+	fun `"ke" is invalid`()
+	fun `"key" is valid`()
+	fun `" ke " is invalid`()
+	fun `" key " is valid`()
+}</code></pre><p>The example above is pretty simple, however, testing the KMP "public Contract / API" is a good start.</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">For complex logic that does not involve orchestrating other classes (e.g. conversions, calculations, validation), try to extract a separate class which can be tested in isolation. This way you have one granular test which covers all the complex edge cases while keeping the "integration" tests simpler by only caring about one or two cases for the complex logic (making sure it is called)</div></div><h3 id="test-set-up-with-object-mothers">Test set-up with Object mothers</h3><p>Because this strategy might involve creating multiple test classes, this means that the system under test and its dependencies need to be created multiple times. Repeating the same set-up boilerplate is tedious and hard to maintain because one will require change in multiple places.</p><p>To keep things DRY, <a href="../../testing-mistakes-part-4/">object mothers</a> can be created, removing boilerplate and making the test set-up simpler:</p><pre><code class="language-Kotlin">class SuccesfulSearchTest : KoinTest {
+
+
+    private lateinit api: Api
+    private lateinit sut: SearchEngine
+
+    @BeforeTest
+    fun setUp() {
+        api = FakeApi()
+        sut = createSearchEngine(api)
+    }
+
+
+    // ...
+}
+
+fun createSearchEngine(
+    api: SearchEngine, 
+    keywordValidator: KeywordValidator = KeywordValidator()
+) =
+    SearchEngine(api, keywordValidator)</code></pre><p>The top level function, createSearchEngine, can be used in all the <em>SearchTests</em> for creating the system under test. An added bonus of such object mothers is that irrelevant implementation details like the <em>KeywordValidator</em> are hidden inside the test class.</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">Such object mothers can also be used for creating complex data structures like REST schemas or GraphQL queries</div></div><h3 id="test-set-up-with-koin">Test set-up with Koin</h3><p>Another way to achieve the set-up would be to use dependency injection, luckily <a href="https://insert-koin.io/?ref=akjaw.com">Koin</a> allows for easy <a href="https://insert-koin.io/docs/reference/koin-test/testing/?ref=akjaw.com">test integrations</a>, which more or less comes down to this:</p><pre><code class="language-kotlin">class SuccesfulSearchTest : KoinTest {
+
+    private val sut: SearchEngine by inject()
+
+    @BeforeTest
+    fun setUp() {
+        startKoin {
+            modules(systemUnderTestModule, testDoubleModule)
+        }
+    }
+
+    @AfterTest
+    fun teardown() {
+        stopKoin()
+    }
+
+    // ...
+}</code></pre><p>The test needs a Koin module which will provide all the needed dependencies. If the Kotlin Multiplatform code base is <a href="../../modularizing-a-kotlin-multiplatform-mobile-project/">modularized</a>, the <strong>systemUnderTestModule</strong> could be the public Koin module that is attached to the dependency graph (e.g. <a href="https://github.com/AKJAW/KMM-Modularization/blob/main/kmm/todos/todos-count-dependency/src/commonMain/kotlin/co/touchlab/kmm/todos/count/dependency/composition/todoCountDependencyModule.kt?ref=akjaw.com">module</a>, <a href="https://github.com/AKJAW/KMM-Modularization/blob/main/kmm/shared/src/commonMain/kotlin/co/touchlab/kampkit/Koin.kt?ref=akjaw.com">dependency graph</a>). An example test suite which uses Koin for test set-up can be found in my <strong><a href="https://github.com/AKJAW/ktor-mock-tests/tree/main/app/src/test/java/com/akjaw/ktor/mock/tests?ref=akjaw.com">ktor-mock-tests</a></strong> repository.</p><h3 id="contract-tests-for-test-doubles">Contract tests for Test Doubles</h3><p>When creating test doubles, there might be a point when they start becoming complex, just because the production code they are replacing is also complex. Writing tests for test helpers might seem unnecessary, however, how would you otherwise prove that a test double behaves like the production counterpart? Contract tests serve that exact purpose, they verify that multiple implementations behave in the same way (that their contract is preserved). </p><p>For example, the system under test uses a database to persist its data, using a real database for every test will make the tests run a lot longer. To help with this, a fake database could be written to make the tests faster. This would result in the real database being used only in one test class and the fake one in all other cases. </p><p>Let's say that real database has the following rules (contract): </p><ul><li>adding a new item updates a "reactive stream"</li><li>new items cannot overwrite an existing item if their id is the same</li></ul><p>The contract base test could look like this:</p><pre><code class="language-kotlin">abstract class DatabaseContractTest {
+   
+   abstract var sut: Dao
+   
+   @Test
+   fun `New items are correctly added`() {
+        val item = Item(1, "name")
+   
+        sut.addItem(item)
+        
+        sut.items shouldContain item
+   }
+   
+   @Test
+   fun `Items with the same id are not overwritten`() {
+        val existingItem = Item(1, "name")
+        sut.addItem(existingItem)
+        val newItem = Item(1, "new item")
+   
+        sut.addItem(newItem)
+        
+        assertSoftly {
+            sut.items shouldNotContain newItem
+            sut.items shouldContain existingItem
+        }
+   }
+}</code></pre><p></p><p>The base class contains the tests which will be run on the implementations (real and fake database):</p><pre><code class="language-kotlin">class SqlDelightDatabaseContractTest : DatabaseContractTest() {
+    override var sut: Dao = createDealDatabase()
+}
+
+class FakeDatabaseContractTest : DatabaseContractTest() {
+    override var sut: Dao = createFakeDatabase()
+}
+</code></pre><p>This is just a trivial example to show a glimpse of what can be done with contract tests. If you'd like to learn more about this, feel free to check out these resources:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://martinfowler.com/bliki/ContractTest.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">bliki: ContractTest</div><div class="kg-bookmark-description">Test Doubles avoid non-deterministic errors, but you need Contract Tests to ensure they remain consistent with the real services.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">martinfowler.com</span><span class="kg-bookmark-publisher">Martin Fowler</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://martinfowler.com/bliki/images/contractTest/sketch.png" alt="" width="478" height="263" layout="responsive"></amp-img></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://www.youtube.com/watch?v=S3qItwfhtCw&amp;ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Outside-In TDD - Search Functionality 6 (The Contract Tests)</div><div class="kg-bookmark-description">In this video, we are leveraging a fake test-double to emerge contract tests that we could use later on to make sure that every new shipping implementation a...</div><div class="kg-bookmark-metadata"><amp-img class="kg-bookmark-icon" src="https://www.youtube.com/s/desktop/d3411c39/img/favicon_144x144.png" alt="" width="144" height="144" layout="fixed"></amp-img><span class="kg-bookmark-author">YouTube</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://i.ytimg.com/vi/S3qItwfhtCw/maxresdefault.jpg" alt="" width="1280" height="720" layout="responsive"></amp-img></div></a></figure><p>Big shout out to <a href="https://jovmit.io/?ref=akjaw.com">Jov Mit</a> for creating so many Android related testing content which inspired this testing strategy (If you're interested in Test Driven Development, be sure to check out his insightful <a href="https://www.youtube.com/channel/UC71omjio31Esx7LytaZ2ytA?ref=akjaw.com">screencast series on YouTube</a>).</p><h2 id="benefits-of-the-strategy">Benefits of the Strategy</h2><h3 id="development-speed">Development speed</h3><p>The strategy I'm proposing would verify the KMM feature / module correctness at a larger scale instead of focusing on verifying individual classes. This more closely resembles how the code behaves in production, which gives us more confidence that the feature will work correctly in the application. This in turn means that there is less need to actually open up the application every time.</p><p>Building applications using Kotlin Multiplatform usually takes longer than their fully native counterparts. The Android app can be built relatively fast thanks to incremental compilation on the JVM, however for iOS the story is different. Kotlin / Native compilation in itself is pretty fast, the issue arises when creating the Objective-C binary where the gradle tasks <em>linkDebugFrameworkIos</em> and <em>linkReleaseFrameworkIos</em> are called. Luckily, tests avoid that because they only compile Kotlin / Native without creating the Objective-C binary. </p><p>Ignoring the build speed issues, let's say that the build didn't take longer. Building the whole application means building all of its parts. But when we work on a feature, we typically only want to focus and verify a small portion of the entire application. <strong>Tests allow just that, verifying only a portion of the app without needing to build everything</strong>. When we're finished working on a feature, we can plug the code into the application and verify that it correctly integrates with other parts of the application.</p><h3 id="test-function-test-case-names">Test function / test case names</h3><p>Because these tests focus more on the end result of the feature rather than on implementation details of a single class, the test function names reflect the behavior of the feature. A lot of time, this behavior also represents the business requirements of the system.</p><h3 id="refactoring">Refactoring</h3><p>With this testing strategy, refactoring would be easier because the tests don't dive into the implementation details of the system under test (like mocks tend to do). They only focus on the end result, as long as the behavior remains the same*, then the tests don't care how it was achieved. </p><p>* And it should be the same, since that's what refactoring is all about.</p><h3 id="kotlin-multiplatform-threading"><s>Kotlin Multiplatform threading</s></h3><p>The <a href="https://kotlinlang.org/docs/whatsnew16.html?ref=akjaw.com#preview-of-the-new-memory-manager">new memory model</a> is the default now, so there are no limitations like in the old memory model. To read more about the old one, you can visit the <a href="/old/old-testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/#kotlin-multiplatform-threading">previous version of this article</a> which covers that.</p><h3 id="test-double-reusability">Test double reusability</h3><p>The last thing I want to touch on is test double reusability. To keep the code DRY, the test doubles could also be moved to a common testing module, which helps with its reusability. For example, the data layer test doubles (e.g. network or persistence) can be often reused for UI tests. An example of this can be found in my <a href="../../using-ktor-client-mock-engine-for-integration-and-ui-tests/">Ktor Mock Engine article</a>, where the integration tests and UI tests use the same engine for returning predefined data (not strictly a test double, but you get the idea). The <a href="https://github.com/AKJAW/ktor-mock-tests?ref=akjaw.com">repository</a> in the article is Android only, but it can easily be applied to Kotlin Multiplatform since <a href="https://ktor.io/docs/http-client-multiplatform.html?ref=akjaw.com">Ktor</a> has great support for it.</p><h2 id="downsides-of-the-strategy">Downsides of the Strategy</h2><h3 id="test-speed">Test speed*</h3><p>The first thing I want to address is the test speed because no one wants to wait too long for the tests to complete. Tests which treat unit as a class are superfast, but only when they use normal test doubles. Mocking frameworks with all their magic take up a lot of time and make the tests much slower compared to a test double written by hand. </p><p>The test strategy I'm proposing does not use any mocking framework, only test doubles written by hand. However, the tests might use a lot more production code in a single test case, which does take more time. From my experience working with these types of tests on Kotlin Multiplatform, I didn't see anything worrying about the test speed (besides Kotlin / Native taking longer). Additionally, if the KMM code base is modularized then only the tests from a given module are executed, which is a much smaller portion of the code base.</p><p>* Test speed is a subjective topic, where every one has a different opinion on it. <a href="https://www.martinfowler.com/?ref=akjaw.com">Martin Fowler</a> has an interesting article which touches on this topic:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://martinfowler.com/bliki/UnitTest.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">bliki: UnitTest</div><div class="kg-bookmark-description">Unit Tests are focused on small parts of a code-base, defined in regular programming tools, and fast. There is disagreement on whether units should be solitary or sociable.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">martinfowler.com</span><span class="kg-bookmark-publisher">Martin Fowler</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://martinfowler.com/bliki/images/unitTest/sketch.png" alt="" width="646" height="506" layout="responsive"></amp-img></div></a></figure><h3 id="test-readability">Test readability</h3><p>As I said before, these tests tend to be more on the integration side than the unit side (depending on how you define it). This means that more dependencies are involved, and more set-up is required.</p><p>To combat this, I recommend splitting the tests into <a href="../../kotlin-multiplatform-parameterized-tests-and-grouping/">multiple files,</a> each focusing on a distinctive part of the behavior. Along with <a href="../../testing-mistakes-part-4/">object mothers,</a> the set-up boilerplate can be reduced and implementation details hidden.</p><p>To understand these tests, more internal knowledge about the system under test is required. This is a doubled edged sword because the tests are not as easy to understand, but after you understand them you'll most likely know how the system under test works along with its collaborators.</p><h3 id="hard-to-define-what-should-be-tested">Hard to define what should be tested</h3><p>Tests where unit is class are easy to write because they always focus on a single class. When a unit is a group of classes, it is hard to define what the group should be, how <em>deep</em> should the test go? </p><p>Unfortunately, there is no rule that works in every case. Every system is different, and has different business requirements. If you start noticing that the test class is becoming too big and too complex, this might be a sign that the test goes too deep. </p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">There might be a feature which just keeps growing, and the test becomes really hard to understand. In such cases, it might be good to refactor the SUT and extract some cohesive group of logic to a separate class which can be tested more granularly. Then the original test uses a Test Double for the extracted class, making it easier to understand. This does require refactoring test code, but makes the Test Suite easier to understand</div></div><h2 id="ci-cd">CI / CD</h2><p>Tests are useless when they are not executed, and it's not a good idea to rely on human memory for that. The best way would be to integrate tests into your Continuous Integration, so they are executed more frequently. </p><p>For example, tests could be run: </p><ul><li>On every PR, making sure nothing broken is merged to the main branch. </li><li>Before starting the Release process.</li><li>Once a day </li><li>All of the above combined.</li></ul><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">For Kotlin Multiplatform, it is important to execute test for all targets. Sometimes everything works on the JVM, but Kotlin Native fails (e.g. Regex, NSDate). So the best way of making sure every platform behaves in the same way is to run tests for all targets</div></div><h2 id="summary">Summary</h2><p>In my opinion, Kotlin Multiplatform should be the most heavily tested part of the whole application. It is used by multiple platforms, so it should be as bulletproof as possible.</p><p>Writing tests during development can cut down on compilation time and give confidence that any future regressions (even 5 minutes later) will be caught by the test suite.</p><p>I hope this article was informative for you, let me know what you think in the comments below!</p>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>

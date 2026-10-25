@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">		<link rel="preconnect" href="../">
+        <link href="../assets/css/screen.min.css" rel="stylesheet">
+		<script>
+    if(typeof(Storage) !== 'undefined') {
+        let themeMode = document.documentElement.getAttribute('data-theme');
+        if (themeMode !== null && themeMode === 'system') {
+            setSysPrefColor();
+        }
+        const theme = localStorage.getItem('selected-theme');
+        if (theme == 'light') {
+            setColorScheme('light');
+        }
+        else if (theme == 'dark') {
+            setColorScheme('dark');
+        }
+    }
+    function setSysPrefColor() {
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+            setColorScheme('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+            if (e.matches) {
+                setColorScheme('dark');
+            } else {
+                setColorScheme('light');
+            }
+        });
+    }
+    function setColorScheme(scheme) {
+        if (scheme=='dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+</script>		<meta name="description" content="Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don&#x27;t want to couple app flavors to features they don&#x27;t use">
+    <link rel="icon" href="../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/dagger-2-multibindings-to-avoid-coupling-in-a-multi-flavor-android-project/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="amp/">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project">
+    <meta property="og:description" content="Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don&#x27;t want to couple app flavors to features they don&#x27;t use">
+    <meta property="og:url" content="https://akjaw.com/dagger-2-multibindings-to-avoid-coupling-in-a-multi-flavor-android-project/">
+    <meta property="og:image" content="https://akjaw.com/content/images/size/w1200/2021/03/multibinding-3.png">
+    <meta property="article:published_time" content="2021-04-16T10:29:00.000Z">
+    <meta property="article:modified_time" content="2022-11-09T17:48:37.000Z">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Dagger2">
+    <meta property="article:tag" content="Kotlin">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project">
+    <meta name="twitter:description" content="Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don&#x27;t want to couple app flavors to features they don&#x27;t use">
+    <meta name="twitter:url" content="https://akjaw.com/dagger-2-multibindings-to-avoid-coupling-in-a-multi-flavor-android-project/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/size/w1200/2021/03/multibinding-3.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Android, Dagger2, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project",
+    "url": "https://akjaw.com/dagger-2-multibindings-to-avoid-coupling-in-a-multi-flavor-android-project/",
+    "datePublished": "2021-04-16T10:29:00.000Z",
+    "dateModified": "2022-11-09T17:48:37.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/size/w1200/2021/03/multibinding-3.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Android, Dagger2, Kotlin",
+    "description": "Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don&#x27;t want to couple app flavors to features they don&#x27;t use",
+    "mainEntityOfPage": "https://akjaw.com/dagger-2-multibindings-to-avoid-coupling-in-a-multi-flavor-android-project/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer src="../public/cards.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../public/cards.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    .post-content > * {
+        margin-bottom: 3rem;
+    }
+    .post-content p + ul {
+        margin-top: -2rem;
+    }
+    .post-content p + .kg-code-card, .post-content p + pre[class*=language-] {
+        margin-top: -1rem;
+    }
+	#hyvor-talk-view .reactions-title {
+        color: #cac7c7;
+     }
+    code[class*=language-], pre[class*=language-] {
+        font-size: 16px;   
+    }
+    .share-wrap {
+        margin-bottom: 0rem;
+        margin-top: 2rem;
+    }
+    .newsletter-section input {
+        border-radius: 32px !important;
+        background: var(--body-bg) !important;
+        border: 1px solid var(--c-border) !important;
+        color: var(--c-text-main) !important;
+        font-weight: 500 !important;
+        padding: 0 2rem !important;
+        font-size: 1.235rem !important;
+    }
+    .newsletter-section input::placeholder {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section #mlb2-4433281.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section #mlb2-4433284.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section .ml-form-embedWrapper {
+        border-radius: 24px !important;
+		background-color: transparent !important;
+        border: 3px solid var(--c-theme) !important;
+    }
+    .newsletter-section .ml-form-embedWrapper p, .newsletter-section .ml-form-embedWrapper h4  {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section .ml-field-email input {
+        height: 56px;
+    }
+    .ml-field-email input {
+        height: inherit;
+    }
+    .post-sneak-peek {
+        position: relative;
+    }
+    .post-sneak-peek.fading:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 50%;
+        background: linear-gradient(transparent, var(--c-body-bg) 90%);
+    }
+</style> 
+
+<script>
+	var apiKey = "a36b1ce3f8a442ba78f296c798";
+</script><style>:root {--ghost-accent-color: #526e8b;}</style>
+	</head>
+	<body class="post-template tag-android tag-dagger2 tag-kotlin" data-nav="sticky-hide" data-search="Third party search">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="global-icons" style="display:none">
+    <symbol id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.083 17.196l4.526 4.528A1.332 1.332 0 0122.667 24a1.33 1.33 0 01-.943-.39l-4.528-4.527a10.602 10.602 0 01-6.53 2.25C4.787 21.333 0 16.548 0 10.667 0 4.785 4.785 0 10.667 0c5.881 0 10.666 4.785 10.666 10.667 0 2.461-.846 4.724-2.25 6.529zm-8.416-14.53c-4.412 0-8 3.589-8 8 0 4.413 3.588 8 8 8s8-3.587 8-8c0-4.411-3.588-8-8-8z"/></symbol>
+    <symbol id="i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.036 7.976a.75.75 0 00-1.06 1.06L10.939 12l-2.963 2.963a.75.75 0 101.06 1.06L12 13.06l2.963 2.964a.75.75 0 001.061-1.06L13.061 12l2.963-2.964a.75.75 0 10-1.06-1.06L12 10.939 9.036 7.976z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></symbol>
+    <symbol id="i-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="person"><rect opacity="0"/><path d="M12 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/><path d="M18 21a1 1 0 0 0 1-1 7 7 0 0 0-14 0 1 1 0 0 0 1 1z"/></g></g></symbol>
+    <symbol id="i-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.228 23.999l.114.001a12.31 12.31 0 008.762-3.624 12.269 12.269 0 002.803-4.315 1.2 1.2 0 00-1.531-1.557c-3.678 1.339-7.836.426-10.593-2.326a10.078 10.078 0 01-2.33-10.564A1.2 1.2 0 007.899.08a12.271 12.271 0 00-4.792 3.292c-4.24 4.722-4.103 12.278.31 16.843A12.311 12.311 0 0012.227 24zM4.892 4.975a9.882 9.882 0 011.65-1.474c-.475 3.772.797 7.633 3.544 10.376 2.75 2.743 6.62 4.008 10.394 3.538-.32.448-.678.87-1.071 1.262A9.932 9.932 0 0112.34 21.6l-.092-.001a9.928 9.928 0 01-7.109-3.053C1.585 14.868 1.473 8.78 4.892 4.975z"/></symbol>
+    <symbol id="i-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8 1.2v2.4a1.2 1.2 0 102.4 0V1.2a1.2 1.2 0 10-2.4 0zM18.876 7.028a1.195 1.195 0 01-1.697-.03 1.2 1.2 0 01.029-1.696l1.727-1.668a1.202 1.202 0 011.668 1.728l-1.727 1.666zM12 16.8c2.647 0 4.8-2.153 4.8-4.8S14.647 7.2 12 7.2A4.805 4.805 0 007.2 12c0 2.647 2.153 4.8 4.8 4.8zM5.124 16.972l-1.727 1.666a1.2 1.2 0 001.668 1.728l1.727-1.668a1.2 1.2 0 00-1.668-1.726zM17.18 17.002c.46-.477 1.22-.49 1.696-.03l1.727 1.666a1.2 1.2 0 01-1.668 1.728l-1.727-1.668a1.2 1.2 0 01-.029-1.696zM12 19.2a1.2 1.2 0 00-1.2 1.2v2.4a1.2 1.2 0 102.4 0v-2.4a1.2 1.2 0 00-1.2-1.2zM5.065 3.634a1.2 1.2 0 00-1.668 1.728l1.727 1.666a1.195 1.195 0 001.697-.03 1.2 1.2 0 00-.029-1.696L5.065 3.634zM3.6 10.8a1.2 1.2 0 110 2.4H1.2a1.2 1.2 0 110-2.4h2.4zM22.8 10.8h-2.4a1.2 1.2 0 100 2.4h2.4a1.2 1.2 0 100-2.4z"/></symbol>
+    <symbol id="i-twitter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></symbol>
+    <symbol id="i-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></symbol>
+</svg>		<div class="site-wrap">
+		<header class="site-header has-theme-icon">
+    <div class="header-inner flex justify-space-between">
+        <div class="header-logo flex">
+            <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+        </div>
+
+        <input id="mobile-menu-toggle" class="mobile-menu-checkbox" type="checkbox">
+        <label for="mobile-menu-toggle" class="mobile-menu-icon" aria-label="menu toggle button">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="sr-only">Menu toggle button</span>
+        </label>
+
+            <nav class="nav-wrap flex" role="navigation" aria-label="Main navigation">
+        <ul class="nav-left no-style-list" role="menu">
+            <li class="nav-item" role="menuitem">
+                <a href="../talks/" class="nav-link">Talks</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/multiplatform/" class="nav-link">Kotlin Multiplatform</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/testing/" class="nav-link">Testing</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../about-me/" class="nav-link">About me</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../iryzyko/" class="nav-link">iRyzyko</a>
+            </li>
+        </ul>
+
+        
+        <div class="icons-wrap">
+            <button href="javascript:;" class="nav-icon search-icon flex js-search-button">
+                <svg><use xlink:href="#i-search"/></svg>
+            </button>
+                        <a href="javascript:;" class="nav-icon theme-icon flex js-toggle-dark-light" aria-label="Toggle theme">
+                <div class="toggle-mode flex">
+                    <span class="light"><svg><use xlink:href="#i-sun"/></svg></span>
+                    <span class="dark"><svg><use xlink:href="#i-moon"/></svg></span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    </div>
+</header>		
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <article class="single-post post-card">
+                    <header class="post-header">
+                        <div class="tag-wrap">
+                            <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                            <a href="../tag/dagger2/" >Dagger2</a>
+                            <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                        </div>
+                        <h1 class="heading-large post-title">
+                            Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project
+                        </h1>
+                        <div class="custom-excerpt">
+                            Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don&#x27;t want to couple app flavors to features they don&#x27;t use
+                        </div>
+                        <div class="post-meta-wrap flex">
+    <div class="author-avatar-wrap">
+        <a href="../author/aleksander/" class="author-image">
+            <img src="../content/images/size/w150/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski">
+        </a>
+    </div>
+    <div class="meta-info">
+        <div class="author-names">
+            
+            <a href="../author/aleksander/">Aleksander Jaworski</a>
+        </div>
+        <div class="date-time">
+            <time class="post-date" datetime="2021-04-16">Apr 16, 2021</time>
+            <span class="read-time">7 min read</span>
+        </div>
+    </div>
+</div>                    </header>
+                    <div class="featured-image-wrap">
+                        <img class="featured-image" loading="lazy"
+                            srcset="../content/images/size/w300/2021/03/multibinding-3.png 300w,
+                               ../content/images/size/w600/2021/03/multibinding-3.png 600w,
+                              ../content/images/size/w1200/2021/03/multibinding-3.png 1200w,"
+                            sizes="(max-width: 340px) 300px, (max-width: 640px) 600px, 1200px"
+                            src="../content/images/size/w1200/2021/03/multibinding-3.png" alt="Using Dagger 2 Multibindings to Avoid Coupling in a Multi Flavor Android Project">
+                    </div>
+                    <div class="featured-image-caption text-center"></div>
+                    <div class="post-content">
+                        <h2 id="introduction">Introduction</h2><p>Adding flavor dependent features on a shared screen can be troublesome. The problem gets even worse when you don't want to couple app flavors to features they don't use. In this article I'll show you how we do in <a href="https://www.linkedin.com/company/footballco?ref=akjaw.com">FootballCo</a> using <a href="https://dagger.dev/dev-guide/multibindings.html?ref=akjaw.com">Dagger 2 Multibinding</a>, <a href="https://github.com/sockeqwe/AdapterDelegates?ref=akjaw.com">AdapterDelegates</a> and<em> some abstractions</em>.</p><p>This example will focus on injecting feature specific RecyclerView items and a concept of "customOrDefault" that we use in our codebase. Multibindings however have a lot more uses than shown here. If you know of other use cases please feel free to share them in the comments below. </p><h2 id="the-apps">The apps</h2><p>There will be two app flavors: a basic and a premium one.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/03/basic-flavor-4.png" class="kg-image" alt loading="lazy" width="381" height="801"><figcaption>The basic flavor shows 3 football matches</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/03/premium-flavor-2.png" class="kg-image" alt loading="lazy" width="381" height="800"><figcaption>The premium flavor has additional 3 basketball matches</figcaption></figure><p>I tried to keep the app simple while still tackling the Android flavor coupling problem.</p><h2 id="gradle-modules">Gradle modules</h2><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/03/module-dependencies-1.png" class="kg-image" alt loading="lazy" width="513" height="313"><figcaption>A diagram of the project gradle modules and their dependencies</figcaption></figure><h3 id="the-app-module">The app module</h3><p>Contains the Activity, RecyclerView Adapter and most importantly it contains the entry point for the dagger modules.</p><p>Additionally, the premium package contains an implementation which is used to override the default app implementation using the <strong>customOrDefault</strong> concept (which will be explained later).</p><p>The gradle dependencies for the app module are as follows:</p><pre><code class="language-groovy">implementation project(":framework")
+implementation project(":dependency:football")
+
+premiumImplementation project(":dependency:bastketball")</code></pre><p></p><h3 id="the-football-and-basketball-modules">The Football and Basketball modules</h3><p>Contain:</p><ul><li>their corresponding match data structure</li><li>an AdapterDelegate which are used for extending the capabilities of the RecyclerView Adapter (shown later)</li><li>a MatchProvider which just returns a list of matches either Football or Basketball depending on the module.</li></ul><p>To keep the example simple the modules implementations are mirrored with slight changes. But multibindings can be used in much more complicated situations where the flavor features are much different.</p><h3 id="the-framework-module">The Framework module</h3><p>This module includes classes which are not implementation details but rather the things that are used by multiple modules, for example:</p><ul><li>Interfaces and other abstractions</li><li>Data structures</li><li>Utilities</li></ul><h2 id="flavor-based-recyclerview-extension-without-coupling-modules">Flavor based RecyclerView extension without coupling modules</h2><p>In the first part of this section I will be showing how the <a href="https://github.com/sockeqwe/AdapterDelegates?ref=akjaw.com">AdapterDelegates</a> library works. If that does not interest you please read the summary below and navigate to the <a href="./#using-dagger-2-multibinds-to-extend-recyclerview-adapter-functionality">second part</a></p><blockquote>Summary:<br>AdapterDelegates are mini RecyclerView Adapters which can be added to the Main Adapter in order to extend the supported types.<br><br>In the first solution the Main Adapter is extended by injecting a concrete class. This means that changing the supported types of the Main Adapter requires changes in the constructor. Multibinding solves the problem by providing an abstraction in the form of a set. Thanks to this set, the constructor requires no changes when a type is added/removed/changed.</blockquote><h3 id="how-adapterdelegates-work">How AdapterDelegates work</h3><blockquote>"Favor composition over inheritance" for RecyclerView Adapters</blockquote><p>AdapterDelegates could be thought of like mini RecyclerView Adapters which can be plugged in into the main Adapter in order to support more item types. This means that adding an additional type to a list only requires an additional AdapterDelegate without needing to add extra logic to the main Adapter.</p><p><strong>The AdapterDelegate for football matches in this project:</strong></p><p>The data structure:</p><pre><code class="language-kotlin">data class FootballMatch(
+    val homeTeamName: String,
+    val awayTeamName: String,
+) : DisplayableItem</code></pre><p></p><p>DisplayableItem is just a marker interface to indicate that this data structure is used as a RecyclerView Adapter item</p><pre><code class="language-kotlin">interface DisplayableItem</code></pre><p></p><p>Taking all of this into account, an AdapterDelegate for a football match looks like this:</p><pre><code class="language-kotlin">internal class FootballMatchAdapterDelegate @Inject constructor() :
+	AdapterDelegate&lt;List&lt;DisplayableItem&gt;&gt;() {
+
+    override fun isForViewType(items: List&lt;DisplayableItem&gt;, position: Int): Boolean =
+        items[position] is FootballMatch
+
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
+        FootballMatchViewHolder(
+            parent.inflateLayout(R.layout.item_football_match)
+        )
+
+    override fun onBindViewHolder(
+        items: List&lt;DisplayableItem&gt;,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payloads: MutableList&lt;Any&gt;
+    ) {
+        val match = items[position] as FootballMatch
+        (holder as FootballMatchViewHolder).bind(match)
+    }
+}</code></pre><p>The FootballMatchAdapterDelegate will be responsible for showing any FootballMatch that is present in the DisplayableItem list. The ViewHolder implemented in the same way as any other ViewHolder, so I won't show it. The basketball implementation is just a mirror to this implementation is also omitted.</p><p>The main RecyclerView Adapter for the FootballMatchAdapterDelegate:</p><pre><code class="language-kotlin">class MatchListAdapter(
+    footballMatchAdapterDelegate: FootballMatchAdapterDelegate
+) : RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;() {
+
+    private val delegatesManager = AdapterDelegatesManager&lt;List&lt;DisplayableItem&gt;&gt;()
+    private var items = listOf&lt;DisplayableItem&gt;()
+
+    init {
+        delegatesManager.addDelegate(footballMatchAdapterDelegate)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return delegatesManager.getItemViewType(items, position)
+    }
+
+    override fun onCreateViewHolder(
+    	parent: ViewGroup, 
+        viewType: Int
+    ): RecyclerView.ViewHolder =
+        delegatesManager.onCreateViewHolder(parent, viewType)
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        delegatesManager.onBindViewHolder(items, position, holder)
+    }
+
+    override fun getItemCount(): Int = items.count()
+
+    fun setItems(newItems: List&lt;DisplayableItem&gt;) {
+        items = newItems
+    }
+}</code></pre><p>The main Adapter basically delegates all of its calls to the registered AdapterDelegates. If a suitable delegate is found then it will handle the item, in the case no appropriate delegate is found, a RunTimeException is thrown.</p><p>Side note: Behind the scenes I used an additional abstraction for the AdapterDelegate superclass to make injections more readable:</p><pre><code class="language-kotlin">abstract class MatchAdapterDelegate : AdapterDelegate&lt;List&lt;DisplayableItem&gt;&gt;()</code></pre><p></p><h3 id="using-dagger-2-multibinds-to-extend-recyclerview-adapter-functionality">Using Dagger 2 Multibinds to extend RecyclerView Adapter functionality</h3><p>Extending the solution from the previous section would require adding an extra constructor parameter along with its addition to the <strong>delegatesManager</strong> property. To make matters worse, it uses the concrete AdapterDelegate implementation instead of an abstraction. This means that adding a basketball AdapterDelegate would require a dependency on the basketball module for both the basic flavor and the premium flavor, even though the basic flavor will not use it.</p><p>Injecting a common supertype (AdapterDelegate or the MatchAdapterDelegate mentioned earlier) and the help of Multibinds allows extending the main Adapter without the need to change the code inside it. The added bonus is that the basic flavor does not need a dependency on the basketball module.</p><p>The dagger module for adding the FootballMatchAdapterDelegate into the dependency graph:</p><pre><code class="language-kotlin">@Module
+abstract class FootballModule {
+
+    @Binds
+    @IntoSet
+    internal abstract fun bindFootballMatchAdapterDelegate(
+        footballMatchAdapterDelegate: FootballMatchAdapterDelegate
+    ): MatchAdapterDelegate
+}</code></pre><p>Thanks to the <strong>@IntoSet </strong>annotation the AdapterDelegate is not bound as a single class in the dagger graph, but as <strong>Set&lt;MatchAdapterDelegate&gt;</strong>. If that sounds confusing I encourage you to read more about dagger multibindings in the official <a href="https://dagger.dev/dev-guide/multibindings.html?ref=akjaw.com">documentation</a>.</p><p>In order for the Set to work correctly, a <strong>@Multibinds</strong> declaration needs to exist in a module that both flavors use:</p><pre><code class="language-kotlin">@Multibinds
+abstract fun multibindMatchAdapterDelegate(): Set&lt;MatchAdapterDelegate&gt;</code></pre><p></p><p>And now instead of injecting a concrete implementation into the main Adapter, the multibound Set can be injected instead:</p><pre><code class="language-kotlin">class MatchListAdapter(
+    matchAdapterDelegates: Set&lt;@JvmSuppressWildcards MatchAdapterDelegate&gt;
+) : RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;() {
+	//...
+    init {
+        matchAdapterDelegates.forEach { delegate -&gt;
+            delegatesManager.addDelegate(delegate)
+        }
+    }
+    //...
+}</code></pre><p>Adding another RecyclerView type now only requires creating an AdapterDelegate and adding it to the dagger dependency graph as a set. The <strong>@JvmSuppressWildcards</strong> is used because of the way that Kotlin defines Set. Sometimes without the annotation dagger won't recognize the generic type.</p><p>Extending the main Adapter with the basketball type, only requires a dagger declaration with an <strong>@IntoSet </strong>annotation:</p><pre><code class="language-kotlin">@Binds
+@IntoSet
+internal abstract fun bindBasketballMatchAdapterDelegate(
+	basketballMatchAdapterDelegate: BasketballMatchAdapterDelegate
+): MatchAdapterDelegate</code></pre><p></p><h2 id="flavor-based-custom-implementation">Flavor based custom implementation</h2><p>In our project we commonly encounter a situation where we need to implement custom behavior in one of the flavors, but the rest should remain as is. To allow this we use a function called <strong>customOrDefault</strong>:</p><pre><code class="language-kotlin">fun &lt;Type&gt; customOrDefault(
+    defaultImplementation: Type, 
+    customImplementationsSet: Set&lt;Type&gt;
+): Type {
+    require(customImplementationsSet.size &lt;= 1) {
+        "Multiple (${customImplementationsSet.size}) custom implementations bound in $customImplementationsSet"
+    }
+    return customImplementationsSet.firstOrNull() ?: defaultImplementation
+}</code></pre><p>The basic idea is that if there is one custom implementation in the set then the custom implementation is used, otherwise the default implementation is used.</p><h3 id="providing-the-default-implementation">Providing the default implementation</h3><p>The basic flavor only provides a list of football matches</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/03/basic-matches.png" class="kg-image" alt loading="lazy" width="345" height="163"><figcaption>A list of only football matches</figcaption></figure><p>These three items come from the default (basic flavor) implementation of the MatchesProvider interface:</p><pre><code class="language-Kotlin">interface MatchesProvider {
+
+    fun get(): List&lt;DisplayableItem&gt;
+}
+</code></pre><pre><code class="language-kotlin">class FootballMatchesProvider @Inject constructor() : MatchesProvider {
+
+    override fun get(): List&lt;DisplayableItem&gt; {
+        return listOf(
+            FootballMatch("Burnley", "Leicester"),
+            FootballMatch("Leipzig", "Wolfsburg"),
+            FootballMatch("Chelsea", "Atlético Madrid"),
+        )
+    }
+}</code></pre><p></p><p>This MatchesProvider interface is used to provide items to the main Adapter:</p><pre><code class="language-kotlin">@Inject
+lateinit var  matchesProvider: MatchesProvider
+//...
+	adapter.setItems(matchesProvider.get())
+//...</code></pre><p></p><p>The MatchesProvider interface is introduced to the dagger dependency graph in the following way:</p><pre><code class="language-kotlin">@Provides
+fun provideDefaultOrCustomMatchesProvider(
+	default: FootballMatchesProvider,
+	custom: Set&lt;@JvmSuppressWildcards MatchesProvider&gt;
+): MatchesProvider =
+	customOrDefault(default, custom)
+    </code></pre><p>If the Set&lt;MatchesProvider&gt; does not exist in the dagger graph then the default FootballMatchesProvider is used. Because the basic flavor does not introduce any additional MatchesProvider it uses the default implementation.</p><p>Side note: This declaration resides in the main package of the app module, meaning that both flavors use it.</p><h3 id="providing-a-custom-implementation">Providing a custom implementation</h3><p>The basketball module provides a MatchesProvider for basketball matches:</p><pre><code class="language-kotlin">class BasketballMatchesProvider @Inject constructor() : MatchesProvider {
+
+    override fun get(): List&lt;DisplayableItem&gt; {
+        return listOf(
+            BasketballMatch("Denver Nuggets", "Boston Celtics"),
+            BasketballMatch("Atlanta Hawks", "Charlotte Hornets"),
+            BasketballMatch("Orlando Magic", "Washington Wizards"),
+        )
+    }
+}</code></pre><p>However binding this as a Set with <strong>@IntoSet</strong> would mean that this implementation is the custom one thus making the premium flavor only show basketball matches.</p><p>To overcome this issue an additional MatchesProvider is defined in the app module within the package of the premium flavor:</p><pre><code class="language-kotlin">class ConcatenatedMatchesProvider @Inject constructor(
+    private val footballMatchesProvider: FootballMatchesProvider,
+    private val basketballMatchesProvider: BasketballMatchesProvider,
+): MatchesProvider {
+
+    override fun get(): List&lt;DisplayableItem&gt; {
+        return footballMatchesProvider.get()
+            .zip(basketballMatchesProvider.get()) { a, b -&gt;
+                listOf(a, b)
+        }.flatten()
+    }
+}</code></pre><p>It basically merges the football and basketball matches together and returns the result.  This implementation is bound in the following way:</p><pre><code class="language-kotlin">@Binds
+@IntoSet
+abstract fun bindMatchesProvider(
+	concatenatedMatchesProvider: ConcatenatedMatchesProvider
+): MatchesProvider
+</code></pre><p></p><p>Because the ConcatenatedMatchesProvider implementation is bound as a set, it will be used as the custom implementation in the <strong>customOrDefault</strong> function:</p><pre><code class="language-kotlin">@Provides
+fun provideDefaultOrCustomMatchesProvider(
+	default: FootballMatchesProvider,
+	custom: Set&lt;@JvmSuppressWildcards MatchesProvider&gt;
+): MatchesProvider =
+	customOrDefault(default, custom)
+   </code></pre><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/03/premium-matches.png" class="kg-image" alt loading="lazy" width="345" height="325"><figcaption>The list of matches from ConcatenatedMatchesProvider</figcaption></figure><h2 id="summary">Summary</h2><p>Dagger2 Multibindings add even more complexity to the dependency injection in Android, but they can be used to solve even more complex problems. The example project for this article is available on <a href="https://github.com/AKJAW/flavor-multibindings?ref=akjaw.com">GitHub</a>, I hope it can be used as learning material for using Dagger 2 Multibindings in Android apps with multiple flavors.</p><p>Some things we used Multibindings for:</p><ul><li>New RecyclerView types</li><li>Additional screens (e.g. Authentication)</li><li>Analytics</li><li>Custom views</li></ul><p>If you have any questions, or you want to share how you used Multibindings to solve a complex problem please write about it below.</p><p>Many thanks to <a href="https://www.linkedin.com/in/micha%C5%82-olszak/?ref=akjaw.com">Michał Olszak</a>, <a href="https://www.linkedin.com/in/apoplawski96/?ref=akjaw.com">Artur Poplawski</a> and <a href="https://www.linkedin.com/in/piotr-sulej-4a4958105/?ref=akjaw.com">Piotr Sulej</a> for the help on this Article.</p>
+                    </div>
+
+                    <div class="post-footer">
+
+                        
+
+                        
+                            
+
+                                
+
+                        <h3 class="h4 about-author-section-title">Written by</h3>
+<div class="about-author flex">
+    <div class="avatar-wrap">
+        <a href="../author/aleksander/" title="Aleksander Jaworski"><img class="avatar" src="../content/images/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski"></a>
+    </div>
+    <div class="author-info">
+        <h3 class="name h4"><a href="../author/aleksander/">Aleksander Jaworski</a></h3>
+        <div class="bio">
+            Kotlin Multiplatform enthusiast, working with it since 2020. First with Kotlin / JS, now fully mobile with Kotlin / Native
+        </div>
+    </div>
+</div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <div class="prev-nex-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="post prev-post">
+                    <a href="../kotlin-coroutine-flow-stopwatch-part1/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/2021/05/hero.png 300w, ../content/images/size/w600/2021/05/hero.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/2021/05/hero.png" alt="Implementing a Stopwatch with Kotlin Coroutines and Flow Part 1 - a Single Stopwatch">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Newer article</div>
+                            <h4 class="title">Implementing a Stopwatch with Kotlin Coroutines and Flow Part 1 - a Single Stopwatch</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2021-05-24">May 24,                                    2021</time>
+                                <span class="read-time">6 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="post next-post">
+                    <a href="../17-intellij-ide-features-for-faster-development/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="https://images.unsplash.com/flagged/photo-1552911942-1f6cea756cf0?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;MXwxMTc3M3wwfDF8c2VhcmNofDM1fHxrZXlib2FyZHxlbnwwfHx8&amp;ixlib&#x3D;rb-1.2.1&amp;q&#x3D;80&amp;w&#x3D;300 300w,
+                                    https://images.unsplash.com/flagged/photo-1552911942-1f6cea756cf0?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;MXwxMTc3M3wwfDF8c2VhcmNofDM1fHxrZXlib2FyZHxlbnwwfHx8&amp;ixlib&#x3D;rb-1.2.1&amp;q&#x3D;80&amp;w&#x3D;600 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="https://images.unsplash.com/flagged/photo-1552911942-1f6cea756cf0?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;MXwxMTc3M3wwfDF8c2VhcmNofDM1fHxrZXlib2FyZHxlbnwwfHx8&amp;ixlib&#x3D;rb-1.2.1&amp;q&#x3D;80&amp;w&#x3D;1200" alt="17 IntelliJ IDEA/Android Studio shortcuts and features for a faster development cycle">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Older article</div>
+                            <h4 class="title">17 IntelliJ IDEA/Android Studio shortcuts and features for a faster development cycle</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2020-12-21">Dec 21,                                    2020</time>
+                                <span class="read-time">5 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    <div class="related-posts-wrap">
+    <div class="container">
+        <h3 class="section-title h5 text-center">You might also like</h3>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../konsist-and-ktlint-in-github-actions-continous-integration/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/10/github-actions-konsist-ktlint-1.png 300w,
+                               ../content/images/size/w600/2023/10/github-actions-konsist-ktlint-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/10/github-actions-konsist-ktlint-1.png" alt="Adding Konsist and Ktlint to a GitHub Actions Continuous Integration">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../konsist-and-ktlint-in-github-actions-continous-integration/">Adding Konsist and Ktlint to a GitHub Actions Continuous Integration</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-11-01">Nov 01, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-github-actions-ci-verification-labels/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/09/kmp-github-actions.png 300w,
+                               ../content/images/size/w600/2023/09/kmp-github-actions.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/09/kmp-github-actions.png" alt="Kotlin Multiplatform GitHub Actions CI Verification using Labels">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-github-actions-ci-verification-labels/">Kotlin Multiplatform GitHub Actions CI Verification using Labels</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-09-02">Sep 02, 2023</time>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png 300w,
+                               ../content/images/size/w600/2023/05/multiplatform-platform-implementation-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png" alt="Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/">Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-05-11">May 11, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../using-apollo-kotlin-data-builders-for-testing/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2022/11/hero.png 300w,
+                               ../content/images/size/w600/2022/11/hero.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2022/11/hero.png" alt="Using Apollo Kotlin Data Builders for Testing">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../using-apollo-kotlin-data-builders-for-testing/">Using Apollo Kotlin Data Builders for Testing</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2022-11-09">Nov 09, 2022</time>
+                        <span class="read-time">5 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+		
+        <footer class="site-footer">
+    <div class="container">
+        <div class="footer-top">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="footer-widget widget-about">
+                        <div class="widget-content">
+                            <div class="footer-logo-wrap">
+                                <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+                            </div>
+                            <div class="site-description">
+                                A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski
+                            </div>
+                            <div class="social-links-wrap flex">
+    <div class="social-links flex">
+        <a href="https://twitter.com/akjaw1" aria-label="twitter link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
+        <a href="https://www.linkedin.com/in/akjaw/" aria-label="instagram link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg></a>
+        <a href="https://github.com/AKJAW" aria-label="github link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+    </div>
+</div>                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="widget secondary-nav flex">
+                        
+    <div class="nav-col">
+        <h3 class="title h6">Content</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="../android-next-level/">Android Next Level</a></li>
+                <li class="nav-link"><a href="../tag/multiplatform/">Kotlin Multiplatform</a></li>
+                <li class="nav-link"><a href="../tag/testing/">Testing</a></li>
+                <li class="nav-link"><a href="../tag/android/">Android</a></li>
+                </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">About</h3>
+        <nav>
+            <ul class="no-style-list">
+                <li class="nav-link"><a href="../about-me/">About me</a></li>
+                <li class="nav-link"><a href="/contact-me/">Contact Me</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">Social</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="https://github.com/AKJAW">GitHub</a></li>
+                <li class="nav-link"><a href="https://www.linkedin.com/in/akjaw/">LinkedIn</a></li>
+                <li class="nav-link"><a href="https://twitter.com/akjaw1">Twitter</a></li>
+                <li class="nav-link"><a href="https://iryzyko.pl/">iRyzyko</a></li>
+            </ul>
+        </nav>
+    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom flex justify-space-between">
+            <div class="copyright">
+    &copy; 2026 <a href="../">AKJAW</a> - All right Reserved. Published with <a href="https://ghost.org?via=biswajit48">Ghost</a>
+</div>        </div>
+    </div>
+</footer>		</div>
+		<div class="search-popup js-search-popup">
+    <div class="search-popup-bg"></div>
+	<a href="javascript:;" class="close-button" id="search-close" aria-label="Close search">
+		<svg><use xlink:href="#i-close"/></svg>
+	</a>
+	<div class="popup-inner">
+        <div class="inner-container">
+            <form class="search-form" id="search-form">
+                <div class="search-form-box flex">
+                    <input type="text" class="search-input" placeholder="Type to search" id="search-input" aria-label="Type to search" role="searchbox" autocomplete="off">
+                </div>
+            </form>
+            <div class="search-close-note">Press ESC to close.</div>
+            <div class="search-result" id="search-results"></div>
+            <div class="suggested-tags tag-wrap" id="suggested-tags">
+                <h2 class="h6">Browse posts by popular tags</h2>
+                <div class="tag-list">
+                    <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                    <a href="../tag/multiplatform/"  style="--c-theme:#7b4fff;">Multiplatform</a>
+                    <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                    <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                    <a href="../tag/ios/" >iOS</a>
+                    <a href="../tag/github-actions/" >GitHub Actions</a>
+                    <a href="../tag/coroutines/" >Coroutines</a>
+                    <a href="../tag/ci-cd/" >CI/CD</a>
+                    <a href="../tag/ktor/" >Ktor</a>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>		
+
+
+
+
+
+
+
+
+
+<div class="notification notification-checkout">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your account is fully activated, you now have access to all content.
+</div>
+
+<div class="notification error notification-checkout-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Stripe checkout failed.
+</div>
+
+<div class="notification notification-billing-update">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your billing info is updated.
+</div>
+
+<div class="notification error notification-billing-update-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Billing info update failed.
+</div>		<script>
+            var nextPage = '';
+            var totalPages = '';
+			var TweetQuoteText ='<svg><use xlink:href="#i-twitter"/></svg><span>Tweet this</span>';
+        </script>
+		
+		<script src="../assets/js/app.bundle.min.js"></script>
+        <script>
+$(document).ready(function() {
+    $('a').each(function() {
+       var a = new RegExp('/' + window.location.host + '/');
+       if(!a.test(this.href)) {
+           $(this).attr("target","_blank")
+       }
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-zc7WDnCM3aom2EziyDIRAtQg1mVXLdILE09Bo+aE1xk0AM2c2cVLfSW9NrxE5tKTX44WBY0Z2HClZ05ur9vB6A==" crossorigin="anonymous"></script>
+	</body>
+</html>

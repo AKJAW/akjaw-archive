@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Writing UI Tests for Pager Layouts in Jetpack Compose</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">		<link rel="preconnect" href="../">
+        <link href="../assets/css/screen.min.css" rel="stylesheet">
+		<script>
+    if(typeof(Storage) !== 'undefined') {
+        let themeMode = document.documentElement.getAttribute('data-theme');
+        if (themeMode !== null && themeMode === 'system') {
+            setSysPrefColor();
+        }
+        const theme = localStorage.getItem('selected-theme');
+        if (theme == 'light') {
+            setColorScheme('light');
+        }
+        else if (theme == 'dark') {
+            setColorScheme('dark');
+        }
+    }
+    function setSysPrefColor() {
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+            setColorScheme('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+            if (e.matches) {
+                setColorScheme('dark');
+            } else {
+                setColorScheme('light');
+            }
+        });
+    }
+    function setColorScheme(scheme) {
+        if (scheme=='dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+</script>		<meta name="description" content="Writing UI tests for pager layouts can be problematic in Compose. In this post, I&#x27;ll share my experience and solutions when dealing with such screens.">
+    <link rel="icon" href="../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/wiriting-ui-tests-for-pager-layouts-jetpack-compose/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="amp/">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Writing UI Tests for Pager Layouts in Jetpack Compose">
+    <meta property="og:description" content="Writing UI tests for pager layouts can be problematic in Compose. In this post, I&#x27;ll share my experience and solutions when dealing with such screens.">
+    <meta property="og:url" content="https://akjaw.com/wiriting-ui-tests-for-pager-layouts-jetpack-compose/">
+    <meta property="og:image" content="https://akjaw.com/content/images/size/w1200/2022/02/testing-compose-pager.png">
+    <meta property="article:published_time" content="2022-02-19T15:18:58.000Z">
+    <meta property="article:modified_time" content="2023-09-02T11:42:30.000Z">
+    <meta property="article:tag" content="Testing">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Compose">
+    <meta property="article:tag" content="Kotlin">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Writing UI Tests for Pager Layouts in Jetpack Compose">
+    <meta name="twitter:description" content="Writing UI tests for pager layouts can be problematic in Compose. In this post, I&#x27;ll share my experience and solutions when dealing with such screens.">
+    <meta name="twitter:url" content="https://akjaw.com/wiriting-ui-tests-for-pager-layouts-jetpack-compose/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/size/w1200/2022/02/testing-compose-pager.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Testing, Android, Compose, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Writing UI Tests for Pager Layouts in Jetpack Compose",
+    "url": "https://akjaw.com/wiriting-ui-tests-for-pager-layouts-jetpack-compose/",
+    "datePublished": "2022-02-19T15:18:58.000Z",
+    "dateModified": "2023-09-02T11:42:30.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/size/w1200/2022/02/testing-compose-pager.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Testing, Android, Compose, Kotlin",
+    "description": "Writing UI tests for pager layouts can be problematic in Compose. In this post, I&#x27;ll share my experience and solutions when dealing with such screens.",
+    "mainEntityOfPage": "https://akjaw.com/wiriting-ui-tests-for-pager-layouts-jetpack-compose/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer src="../public/cards.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../public/cards.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    .post-content > * {
+        margin-bottom: 3rem;
+    }
+    .post-content p + ul {
+        margin-top: -2rem;
+    }
+    .post-content p + .kg-code-card, .post-content p + pre[class*=language-] {
+        margin-top: -1rem;
+    }
+	#hyvor-talk-view .reactions-title {
+        color: #cac7c7;
+     }
+    code[class*=language-], pre[class*=language-] {
+        font-size: 16px;   
+    }
+    .share-wrap {
+        margin-bottom: 0rem;
+        margin-top: 2rem;
+    }
+    .newsletter-section input {
+        border-radius: 32px !important;
+        background: var(--body-bg) !important;
+        border: 1px solid var(--c-border) !important;
+        color: var(--c-text-main) !important;
+        font-weight: 500 !important;
+        padding: 0 2rem !important;
+        font-size: 1.235rem !important;
+    }
+    .newsletter-section input::placeholder {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section #mlb2-4433281.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section #mlb2-4433284.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section .ml-form-embedWrapper {
+        border-radius: 24px !important;
+		background-color: transparent !important;
+        border: 3px solid var(--c-theme) !important;
+    }
+    .newsletter-section .ml-form-embedWrapper p, .newsletter-section .ml-form-embedWrapper h4  {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section .ml-field-email input {
+        height: 56px;
+    }
+    .ml-field-email input {
+        height: inherit;
+    }
+    .post-sneak-peek {
+        position: relative;
+    }
+    .post-sneak-peek.fading:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 50%;
+        background: linear-gradient(transparent, var(--c-body-bg) 90%);
+    }
+</style> 
+
+<script>
+	var apiKey = "a36b1ce3f8a442ba78f296c798";
+</script><style>:root {--ghost-accent-color: #526e8b;}</style>
+	</head>
+	<body class="post-template tag-testing tag-android tag-compose tag-kotlin" data-nav="sticky-hide" data-search="Third party search">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="global-icons" style="display:none">
+    <symbol id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.083 17.196l4.526 4.528A1.332 1.332 0 0122.667 24a1.33 1.33 0 01-.943-.39l-4.528-4.527a10.602 10.602 0 01-6.53 2.25C4.787 21.333 0 16.548 0 10.667 0 4.785 4.785 0 10.667 0c5.881 0 10.666 4.785 10.666 10.667 0 2.461-.846 4.724-2.25 6.529zm-8.416-14.53c-4.412 0-8 3.589-8 8 0 4.413 3.588 8 8 8s8-3.587 8-8c0-4.411-3.588-8-8-8z"/></symbol>
+    <symbol id="i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.036 7.976a.75.75 0 00-1.06 1.06L10.939 12l-2.963 2.963a.75.75 0 101.06 1.06L12 13.06l2.963 2.964a.75.75 0 001.061-1.06L13.061 12l2.963-2.964a.75.75 0 10-1.06-1.06L12 10.939 9.036 7.976z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></symbol>
+    <symbol id="i-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="person"><rect opacity="0"/><path d="M12 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/><path d="M18 21a1 1 0 0 0 1-1 7 7 0 0 0-14 0 1 1 0 0 0 1 1z"/></g></g></symbol>
+    <symbol id="i-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.228 23.999l.114.001a12.31 12.31 0 008.762-3.624 12.269 12.269 0 002.803-4.315 1.2 1.2 0 00-1.531-1.557c-3.678 1.339-7.836.426-10.593-2.326a10.078 10.078 0 01-2.33-10.564A1.2 1.2 0 007.899.08a12.271 12.271 0 00-4.792 3.292c-4.24 4.722-4.103 12.278.31 16.843A12.311 12.311 0 0012.227 24zM4.892 4.975a9.882 9.882 0 011.65-1.474c-.475 3.772.797 7.633 3.544 10.376 2.75 2.743 6.62 4.008 10.394 3.538-.32.448-.678.87-1.071 1.262A9.932 9.932 0 0112.34 21.6l-.092-.001a9.928 9.928 0 01-7.109-3.053C1.585 14.868 1.473 8.78 4.892 4.975z"/></symbol>
+    <symbol id="i-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8 1.2v2.4a1.2 1.2 0 102.4 0V1.2a1.2 1.2 0 10-2.4 0zM18.876 7.028a1.195 1.195 0 01-1.697-.03 1.2 1.2 0 01.029-1.696l1.727-1.668a1.202 1.202 0 011.668 1.728l-1.727 1.666zM12 16.8c2.647 0 4.8-2.153 4.8-4.8S14.647 7.2 12 7.2A4.805 4.805 0 007.2 12c0 2.647 2.153 4.8 4.8 4.8zM5.124 16.972l-1.727 1.666a1.2 1.2 0 001.668 1.728l1.727-1.668a1.2 1.2 0 00-1.668-1.726zM17.18 17.002c.46-.477 1.22-.49 1.696-.03l1.727 1.666a1.2 1.2 0 01-1.668 1.728l-1.727-1.668a1.2 1.2 0 01-.029-1.696zM12 19.2a1.2 1.2 0 00-1.2 1.2v2.4a1.2 1.2 0 102.4 0v-2.4a1.2 1.2 0 00-1.2-1.2zM5.065 3.634a1.2 1.2 0 00-1.668 1.728l1.727 1.666a1.195 1.195 0 001.697-.03 1.2 1.2 0 00-.029-1.696L5.065 3.634zM3.6 10.8a1.2 1.2 0 110 2.4H1.2a1.2 1.2 0 110-2.4h2.4zM22.8 10.8h-2.4a1.2 1.2 0 100 2.4h2.4a1.2 1.2 0 100-2.4z"/></symbol>
+    <symbol id="i-twitter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></symbol>
+    <symbol id="i-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></symbol>
+</svg>		<div class="site-wrap">
+		<header class="site-header has-theme-icon">
+    <div class="header-inner flex justify-space-between">
+        <div class="header-logo flex">
+            <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+        </div>
+
+        <input id="mobile-menu-toggle" class="mobile-menu-checkbox" type="checkbox">
+        <label for="mobile-menu-toggle" class="mobile-menu-icon" aria-label="menu toggle button">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="sr-only">Menu toggle button</span>
+        </label>
+
+            <nav class="nav-wrap flex" role="navigation" aria-label="Main navigation">
+        <ul class="nav-left no-style-list" role="menu">
+            <li class="nav-item" role="menuitem">
+                <a href="../talks/" class="nav-link">Talks</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/multiplatform/" class="nav-link">Kotlin Multiplatform</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/testing/" class="nav-link">Testing</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../about-me/" class="nav-link">About me</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../iryzyko/" class="nav-link">iRyzyko</a>
+            </li>
+        </ul>
+
+        
+        <div class="icons-wrap">
+            <button href="javascript:;" class="nav-icon search-icon flex js-search-button">
+                <svg><use xlink:href="#i-search"/></svg>
+            </button>
+                        <a href="javascript:;" class="nav-icon theme-icon flex js-toggle-dark-light" aria-label="Toggle theme">
+                <div class="toggle-mode flex">
+                    <span class="light"><svg><use xlink:href="#i-sun"/></svg></span>
+                    <span class="dark"><svg><use xlink:href="#i-moon"/></svg></span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    </div>
+</header>		
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <article class="single-post post-card">
+                    <header class="post-header">
+                        <div class="tag-wrap">
+                            <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                            <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                            <a href="../tag/compose/" >Compose</a>
+                            <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                        </div>
+                        <h1 class="heading-large post-title">
+                            Writing UI Tests for Pager Layouts in Jetpack Compose
+                        </h1>
+                        <div class="custom-excerpt">
+                            Writing UI tests for pager layouts can be problematic in Compose. In this post, I&#x27;ll share my experience and solutions when dealing with such screens.
+                        </div>
+                        <div class="post-meta-wrap flex">
+    <div class="author-avatar-wrap">
+        <a href="../author/aleksander/" class="author-image">
+            <img src="../content/images/size/w150/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski">
+        </a>
+    </div>
+    <div class="meta-info">
+        <div class="author-names">
+            
+            <a href="../author/aleksander/">Aleksander Jaworski</a>
+        </div>
+        <div class="date-time">
+            <time class="post-date" datetime="2022-02-19">Feb 19, 2022</time>
+            <span class="read-time">8 min read</span>
+        </div>
+    </div>
+</div>                    </header>
+                    <div class="featured-image-wrap">
+                        <img class="featured-image" loading="lazy"
+                            srcset="../content/images/size/w300/2022/02/testing-compose-pager.png 300w,
+                               ../content/images/size/w600/2022/02/testing-compose-pager.png 600w,
+                              ../content/images/size/w1200/2022/02/testing-compose-pager.png 1200w,"
+                            sizes="(max-width: 340px) 300px, (max-width: 640px) 600px, 1200px"
+                            src="../content/images/size/w1200/2022/02/testing-compose-pager.png" alt="Writing UI Tests for Pager Layouts in Jetpack Compose">
+                    </div>
+                    <div class="featured-image-caption text-center"></div>
+                    <div class="post-content">
+                        <p>Recently, I was tasked with creating a Pager screen using Compose. Because the screen had a lot of edge cases in it, I also wanted to write UI tests alongside the screen to ensure all features are covered. In this post, I'll share my experience on testing such screens.</p><p>All the working code samples can be found here on the GitHub repository <a href="https://github.com/AKJAW/testing-compose-pager?ref=akjaw.com">testing-compose-pager</a>.</p><p>Here's a brief overview on what will be touched in this article:</p><ul><li>The semantic node tree for pager layouts</li><li>Swiping between screens</li><li>Selecting nodes only from a specific pager layout page</li><li>Selecting off-screen tabs </li></ul><h2 id="the-app-under-test">The app under test </h2><p>The main screen just allows navigating to the two pager screens (It will not be tested)</p><figure class="kg-card kg-image-card"><img src="../content/images/2022/02/device-2022-02-08-175856-2-1.png" class="kg-image" alt loading="lazy" width="300" height="634"></figure><p>The <strong>static</strong> pager screen has 3 predefined pages, the summary page has two buttons that allow changing the selected page. The other two pages just contain a simple text.</p><p>The <strong>dynamic</strong> pager screen allows for increasing and decreasing the pager layout page count. Every page has more or less the same content.</p><p>The Pager library used for this article comes from the <a href="https://google.github.io/accompanist/pager/?ref=akjaw.com">Accompanist Utils library for Jetpack Compose</a>.</p><h2 id="the-static-pager-screen">The Static Pager Screen</h2><figure class="kg-card kg-gallery-card kg-width-wide kg-card-hascaption"><div class="kg-gallery-container"><div class="kg-gallery-row"><div class="kg-gallery-image"><img src="../content/images/2022/02/device-2022-02-08-175943-2.png" width="300" height="633" loading="lazy" alt></div><div class="kg-gallery-image"><img src="../content/images/2022/02/device-2022-02-08-175955-2.png" width="300" height="633" loading="lazy" alt></div></div></div><figcaption>The summary allows navigating to other tabs, Info and Details just show some text</figcaption></figure><p>Here's a simplified structure of the static pager screen composable, the full source code is available on the <a href="https://github.com/AKJAW/testing-compose-pager/blob/main/app/src/main/java/com/akjaw/testing/compose/pager/StaticPagerScreen.kt?ref=akjaw.com">GitHub repository</a>.</p><pre><code class="language-kotlin">enum class StaticPagerScreenPage {
+    Summary,
+    Info,
+    Details,
+}</code></pre><pre><code class="language-kotlin">@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun StaticPagerScreen() {
+    val pages = remember {
+        listOf(
+            StaticPagerScreenPage.Summary,
+            StaticPagerScreenPage.Info,
+            StaticPagerScreenPage.Details,
+        )
+    }
+    Column {
+        TabRow() {
+            ...
+        }
+        HorizontalPager() { index -&gt;
+            val page = pages[index]
+            Box() {
+                ....
+            }
+        }
+    }
+}</code></pre><h2 id="the-static-pager-tests">The Static Pager Tests</h2><p>The static pager screen is easier to test because every page has unique content. Meaning that the testing framework won't be confused when selecting nodes (The next and previous pages don't interfere).</p><h3 id="set-up">Set up</h3><pre><code class="language-kotlin">@Before
+fun setUp() {
+    composeTestRule.setContent {
+        TestingComposePagerTheme {
+            StaticPagerScreen()
+        }
+    }
+}</code></pre><h3 id="pager-semantic-node-tree">Pager semantic node tree</h3><p>Before showing the tests, I want to explain how compose interprets the pager content in its semantic node tree. </p><p>By default, the pager works by "placing" the current, previous and next page in the tree. This means that at the same time, three pages can exist in the semantic node tree. Here's a simplified tree when opening the static pager screen:</p><pre><code class="language-text">|-Node #5 at (l=0.0, t=303.0, r=1080.0, b=2148.0)px
+   CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@bf668a0'
+   Actions = [IndexForKey, ScrollBy, ScrollToIndex]
+    |-Node #18 at (l=0.0, t=303.0, r=1080.0, b=2148.0)px
+    |  |-Node #19 at (l=241.0, t=675.0, r=840.0, b=768.0)px
+    |  | Text = '[The Summary page]'
+    |  | Actions = [GetTextLayoutResult]
+    |-Node #26 at (l=0.0, t=303.0, r=1080.0, b=2148.0)px
+       |-Node #27 at (l=0.0, t=303.0, r=662.0, b=396.0)px
+         Text = '[The Information page]'
+         Actions = [GetTextLayoutResult]</code></pre><p>The Node #18 and #26 represent the content of the first and second page. In tests, both of these pages are accessible, but only the first one is displayed:</p><pre><code class="language-kotlin">@Test
+fun theSecondPageIsInTheNodeTree() {
+    composeTestRule.onNodeWithText("The Summary page").assertIsDisplayed()
+    composeTestRule.onNodeWithText("The Information page").assertIsNotDisplayed()
+}</code></pre><p></p><p>The third page however does not exist in the node tree:</p><pre><code class="language-kotlin">@Test
+fun theThirdPageDoesNotExistInTheNodeTree() {
+    composeTestRule.onNodeWithText("The Details page").assertDoesNotExist()
+}</code></pre><p></p><p>This behavior of rendering sibling pages can be problematic when dealing with pages that have content which is not unique between pages. The dynamic pager screen section goes into details on how to differentiate between these types of pages in tests.</p><h3 id="swiping-between-pages">Swiping between pages</h3><p>Swiping horizontally between content is one of the most recognizable features of pagers. Fortunately, with compose, swiping gestures are really easy to perform:</p><pre><code class="language-kotlin">@Test
+fun swipingLeftOnRootTwoTimesOpensTheDetailsPage() {
+    composeTestRule.onRoot().performTouchInput {
+        swipeLeft()
+        swipeLeft()
+    }
+
+    composeTestRule.onNodeWithText("Details").assertIsSelected()
+    composeTestRule.onNodeWithText("The Details page").assertIsDisplayed()
+}</code></pre><p>The test verification ensures that the <strong>Details</strong> tab is selected, and that the details page content is displayed after swiping two times to the left.</p><p>Performing swiping <em>onRoot</em> works because swipes are performed in the middle of the node (which, in this case, the whole screen):</p><pre><code class="language-kotlin">val height: Int get() = visibleSize.height
+
+val centerY: Float get() = height / 2f
+
+fun TouchInjectionScope.swipeLeft(
+    startX: Float = right,
+    endX: Float = left,
+    durationMillis: Long = 200
+) {
+    ...
+    val start = Offset(startX, centerY)
+    val end = Offset(endX, centerY)
+    swipe(start, end, durationMillis)
+}</code></pre><h3 id="changing-pages-by-tapping-the-tab">Changing pages by tapping the tab</h3><p>Another popular way of changing pages is by tapping their corresponding tab.</p><pre><code class="language-kotlin">@Test
+fun clickingInfoTabOpensTheInfoPage() {
+    composeTestRule.onNodeWithText("Info").performClick()
+
+    composeTestRule.onNodeWithText("Info").assertIsSelected()
+    composeTestRule.onNodeWithText("The Information page").assertIsDisplayed()
+}</code></pre><h3 id="changing-pages-by-tapping-the-summary-page-button">Changing pages by tapping the summary page button</h3><p>There might be also additional ways of changing pages.</p><pre><code class="language-kotlin">@Test
+fun clickingGoToInfoOpensTheInfoPage() {
+    composeTestRule.onNodeWithText("Go to info").performClick()
+
+    composeTestRule.onNodeWithText("Info").assertIsSelected()
+    composeTestRule.onNodeWithText("The Information page").assertIsDisplayed()
+}</code></pre><h3 id="static-pager-summary">Static pager summary</h3><p>Because all static pages have unique content, all nodes be accessed like in normal composable screens i.e. using <em>onNodeWithText</em>, <em>onNodeWithTag, onNodeWithContentDescription.</em></p><p>The full static test source code is available on <a href="https://github.com/AKJAW/testing-compose-pager/blob/main/app/src/androidTest/java/com/akjaw/testing/compose/pager/StaticPagerScreenTest.kt?ref=akjaw.com">GitHub</a> and here are the tests in action:</p><figure class="kg-card kg-embed-card"><iframe src="https://player.vimeo.com/video/682937687?h=71cd3d3333&amp;app_id=122963" width="202" height="426" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Android UI Tests for the Static Pager Screen"></iframe></figure><h2 id="the-dynamic-pager-screen">The Dynamic Pager Screen</h2><p>This screen is more involved because the number of pages can change, and their content is not unique (The increase and decrease buttons).</p><figure class="kg-card kg-gallery-card kg-width-wide kg-card-hascaption"><div class="kg-gallery-container"><div class="kg-gallery-row"><div class="kg-gallery-image"><img src="../content/images/2022/02/device-2022-02-08-175840-2.png" width="300" height="634" loading="lazy" alt></div><div class="kg-gallery-image"><img src="../content/images/2022/02/device-2022-02-08-175919-2.png" width="300" height="634" loading="lazy" alt></div></div></div><figcaption>Every page can increase or decrease the page count</figcaption></figure><p>Here's a simplified structure of the dynamic pager screen composable, the full source code is available on the <a href="https://github.com/AKJAW/testing-compose-pager/blob/main/app/src/main/java/com/akjaw/testing/compose/pager/DynamicPagerScreen.kt?ref=akjaw.com">GitHub repository</a>.</p><pre><code class="language-kotlin">@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun DynamicPagerScreen() {
+    var pageCount by remember { mutableStateOf(1) }
+    val pages = remember(pageCount) { List(pageCount) { "Page $it" } }
+    Column {
+        ScrollableTabRow() {
+           ...
+        }
+        HorizontalPager(
+            count = pages.size,
+            state = pagerState,
+        ) { index -&gt;
+            val page = pages[index]
+            Box() {
+                ...
+            }
+        }
+    }
+}</code></pre><p></p><p>In order to make the tests easier to write, some test tags can be added (a content description can also be used instead):</p><pre><code class="language-kotlin">Column {
+    ScrollableTabRow(modifier = Modifier.testTag("dynamic-pager-tab-row")) { ... }
+    HorizontalPager() { index -&gt;
+        val page = pages[index]
+        Box(modifier = Modifier.testTag("dynamic-pager-$index")) { ... }
+    }
+}</code></pre><p></p><p>The tags can also be extracted to a companion object, to make maintenance easier:</p><pre><code class="language-kotlin">object TestTagsDynamicPagerScreen {
+
+    private const val pager = "dynamic-pager"
+    const val tabRow = "dynamic-pager-tab-row"
+
+    fun getPageTag(index: Int) = "$pager-$index"
+}
+
+...
+
+Column {
+    ScrollableTabRow(modifier = Modifier.testTag(TestTagsDynamicPagerScreen.tabRow)) { ... }
+    HorizontalPager() { index -&gt;
+        val page = pages[index]
+        Box(modifier = Modifier.testTag(TestTagsDynamicPagerScreen.getPageTag(index))) { ... }
+    }
+}
+</code></pre><h2 id="the-dynamic-pager-tests">The Dynamic Pager Tests</h2><h3 id="set-up-1">Set up</h3><pre><code class="language-kotlin">@Before
+fun setUp() {
+    composeTestRule.setContent {
+        TestingComposePagerTheme {
+            DynamicPagerScreen()
+        }
+    }
+}</code></pre><h3 id="dealing-with-repeating-page-content">Dealing with repeating page content</h3><p>Because every page has the same two buttons, the tests will need to specify which page needs to be used. </p><p>For example, on entering, the dynamic pager screen only has one page available. This is the reason is why the following snipped of code works:</p><pre><code class="language-kotlin">@Test
+fun worksIfOnlyOnePageExists() {
+    composeTestRule.onNodeWithText("Increase").performClick()
+}</code></pre><p></p><p>But when there are two pages (both have the <strong>Increase</strong> button) the testing framework gets confused:</p><pre><code class="language-kotlin">@Test
+fun crashesOnSecondClick() {
+    composeTestRule.onNodeWithText("Increase").performClick()
+    composeTestRule.onNodeWithText("Increase").performClick()
+}</code></pre><pre><code class="language-Text">Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text + EditableText contains 'Increase' (ignoreCase: false))</code></pre><p></p><p>To get around this, the selector needs to know on which screen should the button be clicked:</p><pre><code class="language-kotlin">@Test
+fun doesNotCrash() {
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+}
+
+private fun ComposeContentTestRule.onPagerButton(
+    pageIndex: Int,
+    text: String
+): SemanticsNodeInteraction {
+    val isOnTheCorrectPage =
+        hasAnyAncestor(hasTestTag(TestTagsDynamicPagerScreen.getPageTag(pageIndex)))
+    return onAllNodesWithText(text)
+        .filterToOne(isOnTheCorrectPage)
+}</code></pre><p>The basic idea is, that all <strong>Increase</strong> buttons are selected (using <em>onAllNodesWithText) </em>and then they are filtered using a matcher. The matcher works as follows: "give me a node that has an <em>ancestor</em> that has a <em>test tag</em> with the requested <em>page index</em>."</p><p>In the example above, the <strong>Increase</strong> button is clicked only on the first page (index == <code>0</code>).</p><h3 id="checking-if-tabs-are-created">Checking if tabs are created</h3><p>The main feature of the dynamic screen is that the number of tabs can be changed on demand.</p><pre><code class="language-kotlin">@Test
+fun increaseClickedOnceTimesThenTabCountIncreases() {
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+
+    composeTestRule.onNodeWithText("Page 0").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Page 1").assertIsDisplayed()
+}</code></pre><h3 id="checking-off-screen-tabs">Checking off-screen tabs</h3><p>When there are too many tabs, they will be added off-screen. In order to access them, the tab row will need to be scrolled horizontally.</p><pre><code class="language-kotlin">@Test
+fun increaseClickedMultipleTimesThenTabCountIncreases() {
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+
+    composeTestRule.onNodeWithTag(TestTagsDynamicPagerScreen.tabRow)
+        .performTouchInput {
+            swipeLeft()
+        }
+    composeTestRule.onNodeWithText("Page 1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Page 2").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Page 3").assertIsDisplayed()
+}</code></pre><h3 id="clicking-increase-on-a-different-page">Clicking increase on a different page</h3><p>The increase and decrease buttons are available on every page, and they should behave in the same way regardless of the page.</p><pre><code class="language-kotlin">@Test
+fun increaseOnSecondTabClickedThenTabCountIncreases() {
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+    composeTestRule.onNodeWithText("Page 1").performClick()
+
+    composeTestRule.onPagerButton(pageIndex = 1, text = "Increase").performClick()
+
+    composeTestRule.onNodeWithText("Page 0").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Page 1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Page 2").assertIsDisplayed()
+}</code></pre><h3 id="swiping-on-page-content">Swiping on page content</h3><p>Instead of performing the swiping <em>onRoot </em>it can also be performed on one particular page.</p><pre><code class="language-kotlin">@Test
+fun swipingLeftOnPageOpensTheCorrectPage() {
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+    composeTestRule.onPagerButton(pageIndex = 0, text = "Increase").performClick()
+
+    composeTestRule.swipeOnPagerScreen(pageIndex = 0)
+    composeTestRule.swipeOnPagerScreen(pageIndex = 1)
+
+    composeTestRule.onNodeWithText("Page 2").assertIsSelected()
+    composeTestRule.onNodeWithText("On page: 2").assertIsDisplayed()
+}
+
+private fun ComposeContentTestRule.swipeOnPagerScreen(
+    pageIndex: Int
+) {
+    onNodeWithTag(TestTagsDynamicPagerScreen.getPageTag(pageIndex))
+        .performTouchInput {
+            swipeLeft()
+        }
+}</code></pre><h3 id="dynamic-pager-summary">Dynamic pager summary</h3><p>Repeating content on pages can be problematic, but compose offers a some-what elegant way of selecting content only on one particular page.</p><p>The full dynamic test source code is available on <a href="https://github.com/AKJAW/testing-compose-pager/blob/main/app/src/androidTest/java/com/akjaw/testing/compose/pager/DynamicPagerScreenTest.kt?ref=akjaw.com">GitHub</a> and below you can see the tests in action:</p><figure class="kg-card kg-embed-card"><iframe src="https://player.vimeo.com/video/682937790?h=0a635be26d&amp;app_id=122963" width="202" height="426" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Android UI Tests for the Dynamic Pager Screen"></iframe></figure><h2 id="testing-screens-with-network-or-database-data">Testing screens with network or database data</h2><p>This article dived deep into the Compose framework using simple examples, but what about real use cases where we need to fetch something from the API, or when we need some database rows?</p><p>These exact topics are covered in some of my other articles:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../using-ktor-client-mock-engine-for-integration-and-ui-tests/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Using Ktor Client MockEngine for Integration and UI Tests</div><div class="kg-bookmark-description">MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2021/12/ktor-mock-tests-1.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../kotlin-multiplatform-testing-sqldelight-integration-ios-android/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Multiplatform In-Memory SQLDelight Database for Integration and UI Testing on iOS and Android</div><div class="kg-bookmark-description">Databases are an integral part of mobile application development, so it’s important that these features are properly tested.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2022/06/hero.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../using-apollo-kotlin-data-builders-for-testing/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Using Apollo Kotlin Data Builders for Testing</div><div class="kg-bookmark-description">Data Builders provide an easy way for creating GraphQL response classes. In this post I’ll show how they can be used to improve your tests.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2022/11/hero.png" alt=""></div></a></figure><hr><p>Side-note: Normally when writing UI Tests it's good to use some form of pattern, like the Robot pattern:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://jakewharton.com/testing-robots/?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Testing Robots – Jake Wharton</div><div class="kg-bookmark-description">Libraries like Espresso allow UI tests to have stable interactions with your app, but without discipline these tests can become hard to manage and require frequent updating. This talk will cover how the so-called robot pattern allows you to create stable, readable, and maintainable tests with the ai…</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">Jake Wharton</span></div></div><div class="kg-bookmark-thumbnail"><img src="http://img.youtube.com/vi/7Y3qIIEyP5c/maxresdefault.jpg" alt=""></div></a></figure><p>If you have a different way of testing pager screens in compose, feel free to share them below in the comment section.</p>
+                    </div>
+
+                    <div class="post-footer">
+
+                        
+
+                        
+                            
+
+                                
+
+                        <h3 class="h4 about-author-section-title">Written by</h3>
+<div class="about-author flex">
+    <div class="avatar-wrap">
+        <a href="../author/aleksander/" title="Aleksander Jaworski"><img class="avatar" src="../content/images/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski"></a>
+    </div>
+    <div class="author-info">
+        <h3 class="name h4"><a href="../author/aleksander/">Aleksander Jaworski</a></h3>
+        <div class="bio">
+            Kotlin Multiplatform enthusiast, working with it since 2020. First with Kotlin / JS, now fully mobile with Kotlin / Native
+        </div>
+    </div>
+</div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <div class="prev-nex-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="post prev-post">
+                    <a href="../refactoring-android-to-kotlin-multiplatform/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/2022/04/hero-1.png 300w, ../content/images/size/w600/2022/04/hero-1.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/2022/04/hero-1.png" alt="Refactoring an Android App to Kotlin Multiplatform">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Newer article</div>
+                            <h4 class="title">Refactoring an Android App to Kotlin Multiplatform</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2022-04-14">Apr 14,                                    2022</time>
+                                <span class="read-time">5 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="post next-post">
+                    <a href="../old/old-testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/size/w300/2023/04/kotlin-multiplatform-testing-1.png 300w,
+                                   ../content/images/size/w600/2023/04/kotlin-multiplatform-testing-1.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/size/w1200/2023/04/kotlin-multiplatform-testing-1.png" alt="Testing on Kotlin Multiplatform Mobile and a Strategy to Speed Up Development Time (2022)">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Older article</div>
+                            <h4 class="title">Testing on Kotlin Multiplatform Mobile and a Strategy to Speed Up Development Time (2022)</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2022-01-21">Jan 21,                                    2022</time>
+                                <span class="read-time">12 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    <div class="related-posts-wrap">
+    <div class="container">
+        <h3 class="section-title h5 text-center">You might also like</h3>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../using-mutation-testing-for-good-test-coverage/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/11/mutation-testing-3.png 300w,
+                               ../content/images/size/w600/2023/11/mutation-testing-3.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/11/mutation-testing-3.png" alt="How I use Mutation Testing to Drive Good Test Case Coverage">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../using-mutation-testing-for-good-test-coverage/">How I use Mutation Testing to Drive Good Test Case Coverage</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-12-05">Dec 05, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png 300w,
+                               ../content/images/size/w600/2023/05/multiplatform-platform-implementation-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png" alt="Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/">Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-05-11">May 11, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/04/kotlin-multiplatform-testing-updated-4.png 300w,
+                               ../content/images/size/w600/2023/04/kotlin-multiplatform-testing-updated-4.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/04/kotlin-multiplatform-testing-updated-4.png" alt="Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-04-15">Apr 15, 2023</time>
+                        <span class="read-time">14 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../testing-mistakes-part-4/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/04/hero-part4-1.png 300w,
+                               ../content/images/size/w600/2023/04/hero-part4-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/04/hero-part4-1.png" alt="21 Testing Mistakes - Part 4">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../testing-mistakes-part-4/">21 Testing Mistakes - Part 4</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-04-07">Apr 07, 2023</time>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+		
+        <footer class="site-footer">
+    <div class="container">
+        <div class="footer-top">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="footer-widget widget-about">
+                        <div class="widget-content">
+                            <div class="footer-logo-wrap">
+                                <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+                            </div>
+                            <div class="site-description">
+                                A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski
+                            </div>
+                            <div class="social-links-wrap flex">
+    <div class="social-links flex">
+        <a href="https://twitter.com/akjaw1" aria-label="twitter link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
+        <a href="https://www.linkedin.com/in/akjaw/" aria-label="instagram link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg></a>
+        <a href="https://github.com/AKJAW" aria-label="github link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+    </div>
+</div>                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="widget secondary-nav flex">
+                        
+    <div class="nav-col">
+        <h3 class="title h6">Content</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="../android-next-level/">Android Next Level</a></li>
+                <li class="nav-link"><a href="../tag/multiplatform/">Kotlin Multiplatform</a></li>
+                <li class="nav-link"><a href="../tag/testing/">Testing</a></li>
+                <li class="nav-link"><a href="../tag/android/">Android</a></li>
+                </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">About</h3>
+        <nav>
+            <ul class="no-style-list">
+                <li class="nav-link"><a href="../about-me/">About me</a></li>
+                <li class="nav-link"><a href="/contact-me/">Contact Me</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">Social</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="https://github.com/AKJAW">GitHub</a></li>
+                <li class="nav-link"><a href="https://www.linkedin.com/in/akjaw/">LinkedIn</a></li>
+                <li class="nav-link"><a href="https://twitter.com/akjaw1">Twitter</a></li>
+                <li class="nav-link"><a href="https://iryzyko.pl/">iRyzyko</a></li>
+            </ul>
+        </nav>
+    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom flex justify-space-between">
+            <div class="copyright">
+    &copy; 2026 <a href="../">AKJAW</a> - All right Reserved. Published with <a href="https://ghost.org?via=biswajit48">Ghost</a>
+</div>        </div>
+    </div>
+</footer>		</div>
+		<div class="search-popup js-search-popup">
+    <div class="search-popup-bg"></div>
+	<a href="javascript:;" class="close-button" id="search-close" aria-label="Close search">
+		<svg><use xlink:href="#i-close"/></svg>
+	</a>
+	<div class="popup-inner">
+        <div class="inner-container">
+            <form class="search-form" id="search-form">
+                <div class="search-form-box flex">
+                    <input type="text" class="search-input" placeholder="Type to search" id="search-input" aria-label="Type to search" role="searchbox" autocomplete="off">
+                </div>
+            </form>
+            <div class="search-close-note">Press ESC to close.</div>
+            <div class="search-result" id="search-results"></div>
+            <div class="suggested-tags tag-wrap" id="suggested-tags">
+                <h2 class="h6">Browse posts by popular tags</h2>
+                <div class="tag-list">
+                    <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                    <a href="../tag/multiplatform/"  style="--c-theme:#7b4fff;">Multiplatform</a>
+                    <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                    <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                    <a href="../tag/ios/" >iOS</a>
+                    <a href="../tag/github-actions/" >GitHub Actions</a>
+                    <a href="../tag/coroutines/" >Coroutines</a>
+                    <a href="../tag/ci-cd/" >CI/CD</a>
+                    <a href="../tag/ktor/" >Ktor</a>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>		
+
+
+
+
+
+
+
+
+
+<div class="notification notification-checkout">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your account is fully activated, you now have access to all content.
+</div>
+
+<div class="notification error notification-checkout-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Stripe checkout failed.
+</div>
+
+<div class="notification notification-billing-update">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your billing info is updated.
+</div>
+
+<div class="notification error notification-billing-update-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Billing info update failed.
+</div>		<script>
+            var nextPage = '';
+            var totalPages = '';
+			var TweetQuoteText ='<svg><use xlink:href="#i-twitter"/></svg><span>Tweet this</span>';
+        </script>
+		
+		<script src="../assets/js/app.bundle.min.js"></script>
+        <script>
+$(document).ready(function() {
+    $('a').each(function() {
+       var a = new RegExp('/' + window.location.host + '/');
+       if(!a.test(this.href)) {
+           $(this).attr("target","_blank")
+       }
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-zc7WDnCM3aom2EziyDIRAtQg1mVXLdILE09Bo+aE1xk0AM2c2cVLfSW9NrxE5tKTX44WBY0Z2HClZ05ur9vB6A==" crossorigin="anonymous"></script>
+ <style>
+.kg-gallery-container {
+	width: inherit;
+}
+    
+p + .language-kotlin {
+    margin-top: -20px;    
+}
+    
+.kg-embed-card {
+    width: 50%;
+    margin: auto;
+ }
+</style>
+	</body>
+</html>

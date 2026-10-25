@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>Kotlin Multiplatform GitHub Actions CI Verification using Labels</title>
+
+    <meta name="description" content="Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the &quot;main&quot; branch by mistake.">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Kotlin Multiplatform GitHub Actions CI Verification using Labels">
+    <meta property="og:description" content="Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the &quot;main&quot; branch by mistake.">
+    <meta property="og:url" content="https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2023/09/kmp-github-actions.png">
+    <meta property="article:published_time" content="2023-09-02T11:24:59.000Z">
+    <meta property="article:modified_time" content="2024-03-06T19:00:12.000Z">
+    <meta property="article:tag" content="Multiplatform">
+    <meta property="article:tag" content="GitHub Actions">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="iOS">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kotlin Multiplatform GitHub Actions CI Verification using Labels">
+    <meta name="twitter:description" content="Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the &quot;main&quot; branch by mistake.">
+    <meta name="twitter:url" content="https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2023/09/kmp-github-actions.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Multiplatform, GitHub Actions, Android, iOS">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Kotlin Multiplatform GitHub Actions CI Verification using Labels",
+    "url": "https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/",
+    "datePublished": "2023-09-02T11:24:59.000Z",
+    "dateModified": "2024-03-06T19:00:12.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2023/09/kmp-github-actions.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Multiplatform, GitHub Actions, Android, iOS",
+    "description": "Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the &quot;main&quot; branch by mistake.",
+    "mainEntityOfPage": "https://akjaw.com/kotlin-multiplatform-github-actions-ci-verification-labels/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">Kotlin Multiplatform GitHub Actions CI Verification using Labels</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2023-09-02">02 Sep 2023</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2023/09/kmp-github-actions.png" width="600" height="340" layout="responsive" 
+                alt="Kotlin Multiplatform GitHub Actions CI Verification using Labels"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <p>In this article, I'll show how to set up a Continuous Integration for a Kotlin Multiplatform repository. This CI will verify that the code changes don't break the main branch. The tool used for this is <a href="https://github.com/features/actions?ref=akjaw.com">GitHub Actions</a> which I use for every personal project because it is integrated with GitHub, and it is free for open source projects.</p><p>The CI verification consists of building the project and running tests both on PRs and on the main branch. However, depending on what label is selected for the PR only selected targets will be run, which saves time and costs (for paid plans).</p><p>The repository (which includes an Android, Desktop and iOS target) used in this article is available here:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/AKJAW/kotlin-multiplatform-github-actions?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - AKJAW/kotlin-multiplatform-github-actions</div><div class="kg-bookmark-description">Contribute to AKJAW/kotlin-multiplatform-github-actions development by creating an account on GitHub.</div><div class="kg-bookmark-metadata"><amp-img class="kg-bookmark-icon" src="https://github.com/fluidicon.png" alt="" width="512" height="512" layout="responsive"></amp-img><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">AKJAW</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://opengraph.githubassets.com/2376ea82e2c5b5fc444f881eb6b4be2441c9775bb2d8952c812cb53a8337c6ae/AKJAW/kotlin-multiplatform-github-actions" alt="" width="1200" height="600" layout="responsive"></amp-img></div></a></figure><p>Keep in mind that this article shows a <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">version of the repository which contains boilerplate</a>. How to remove this boilerplate is the topic of my <a href="../../github-actions-reducing-duplication-boilerplate/">other article</a>.</p><h3 id="why-is-such-verification-needed">Why is such verification needed?</h3><p>Such a Continuous Integration will give us confidence, that changes made in the project don't break anything. It offloads the verification to an automated process, which doesn't forget and runs with little manual input.</p><p>If you'd like to fully automate this verification, checkout out my follow-up article on setting up <a href="../../kotlin-multiplatform-gha-automated-labels/">automated labels</a>.</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text">Having automatic verifications is an important part of Software Development, as the project and team grows it becomes crucial that no regressions are introduced into the "main" branch by mistake.</div></div><h2 id="steps">Steps</h2><p>Before delving into the details, I just want to show the steps which will be used in the workflow. Every job contains the same set-up steps, so they will be omitted for brevity in the examples, the full code is available in the <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/tree/boilerplate/.github/workflows?ref=akjaw.com">repository</a>.</p><figure class="kg-card kg-code-card"><pre><code class="language-yaml">steps:
+  - uses: actions/checkout@v3
+
+  - uses: actions/setup-java@v3
+    with:
+      distribution: "adopt"
+      java-version: "11"
+
+  - name: Setup Gradle
+    uses: gradle/gradle-build-action@v2</code></pre><figcaption>The repeated set-up code</figcaption></figure><h3 id="build">Build</h3><p>The Android and Desktop jobs are pretty much the same, with only the module being different. Both can be run on Ubuntu machines (which are the <a href="https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions?ref=akjaw.com#minute-multipliers">cheapest</a>):</p><pre><code class="language-yaml">Android:
+  if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false) }}
+  runs-on: ubuntu-latest
+
+  steps:
+    # ...
+    - run: ./gradlew :androidApp:assemble
+</code></pre><pre><code class="language-yaml">Desktop:
+  if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false) }}
+  runs-on: ubuntu-latest
+
+  steps:
+    # ...
+    - run: ./gradlew :desktopApp:assemble</code></pre><p>iOS requires a macOS machine and is more involved as besides Gradle it also needs to set up CocoaPods and pods installation before running the build:</p><pre><code class="language-yaml">iOS:
+  if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false) }}
+  runs-on: macos-12
+
+  steps:
+    # ...
+    - run: ./gradlew :shared:generateDummyFramework
+
+    - name: Set up cocoapods
+      uses: maxim-lobanov/setup-cocoapods@v1
+      with:
+        version: latest
+
+    - name: Install Dependencies
+      run: |
+        cd iosApp
+        pod install --verbose
+
+    - run: xcodebuild build -workspace iosApp/iosApp.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose
+</code></pre><h3 id="test">Test</h3><p>These jobs are pretty much the same, the only difference being the last Gradle / Xcode command</p><figure class="kg-card kg-code-card"><pre><code class="language-bash">./gradlew clean testDebugUnitTest -p shared/</code></pre><figcaption>KMP Android</figcaption></figure><figure class="kg-card kg-code-card"><pre><code class="language-bash">./gradlew clean desktopTest -p shared</code></pre><figcaption>KMP Desktop</figcaption></figure><p>Because now Macs with M1/M2 have a different architecture than Intel, they require a different command. The if statement launches the correct command depending on the system architecture (As of now every GitHub runner has Intel, but this future proofs the CI and allows for <a href="https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners?ref=akjaw.com">self-hosted runners</a> using M1).</p><figure class="kg-card kg-code-card"><pre><code class="language-bash">if [[ $(uname -m) == 'arm64' ]]; then ./gradlew clean iosSimulatorArm64Test -p shared/; else ./gradlew clean iosX64Test -p shared/; fi</code></pre><figcaption>KMP iOS</figcaption></figure><figure class="kg-card kg-code-card"><pre><code class="language-bash">./gradlew clean testDebug -p androidApp/</code></pre><figcaption>Android</figcaption></figure><figure class="kg-card kg-code-card"><pre><code class="language-bash">./gradlew clean jvmTest -p desktopApp/</code></pre><figcaption>Desktop</figcaption></figure><div class="kg-card kg-callout-card kg-callout-card-yellow"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">The Gradle<strong> -p parameter</strong> is needed if the <a href="../../modularizing-a-kotlin-multiplatform-mobile-project/">project is modularized</a>. It basically runs the command for all sub-modules in the given module/directory.</div></div><figure class="kg-card kg-code-card"><pre><code class="language-bash">xcodebuild build test -workspace iosApp/iosApp.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose</code></pre><figcaption>iOS</figcaption></figure><p>With native iOS tests I've run into a problem caused by Compose Multiplatform which I was not able to solve, so for now they are just skipped.</p><figure class="kg-card kg-code-card"><pre><code>Uncaught Kotlin exception: kotlin.IllegalStateException: Metal is not supported on this system</code></pre><figcaption>The error when running the iOS tests</figcaption></figure><p>Maybe someone will be able to show me a different way of running tests which works on GHA 😄 (Comment below if you have any ideas).</p><div class="kg-card kg-callout-card kg-callout-card-yellow"><div class="kg-callout-text">If you'd like to learn more about Kotlin Multiplatform Testing, you can check out <a href="../../tag/testing/">my other articles</a> which focus on this topic.</div></div><h2 id="code-review-workflow">Code Review Workflow</h2><p>Both the Build and UnitTests workflows are called from the main Code Review workflow:</p><pre><code class="language-yaml">name: Code review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+    branches:
+      - main
+
+jobs:
+  Build:
+    uses: ./.github/workflows/build.yml
+
+  UnitTests:
+    uses: ./.github/workflows/test.yml</code></pre><p>This is the workflow which will be run on opened PRs and on the main branch after merging.</p><h3 id="running-the-verification-only-when-it-makes-sense">Running the verification only when it makes sense </h3><p>You may have noticed, that all the build jobs share the same if statement (along with UnitTests):</p><pre><code class="language-yaml">if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false) }}</code></pre><p>This is because the jobs should only run on certain conditions</p><ul><li>When a PR is opened</li><li>When a commit is pushed (but only on the main branch or on an opened PR)</li><li>When stared manually on GitHub</li></ul><p>The jobs shouldn't run when the PR is a draft, because these PRs are still a Work In Progress, so it makes no sense to waste resources on verifying them.</p><h3 id="running-only-the-required-jobs">Running only the required jobs</h3><p>The current solution runs every target / job regardless of what was changed. This can be improved by introducing labels to the project</p><figure class="kg-card kg-image-card"></figure><p>Then these labels can be used on GHA to decide if something should be run or not:</p><pre><code class="language-yaml">Android:
+  if: ${{ contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Android')}}
+  runs-on: ubuntu-latest
+
+  steps:
+    # ...
+    - run: ./gradlew :androidApp:assemble    </code></pre><p>The Android build job will be only run when the PR contains either a KMP or an Android label. </p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text">Running only specified jobs speeds up the CI and also helps with reducing the costs of GitHub Actions on paid plans / private repositories. With Kotlin Multiplatform, the bulk of the costs comes from iOS, as the macOS machines cost <strong>10 times</strong> <strong>more</strong> than Ubuntu!</div></div><p>Please note that the above if statement for labels needs to be combined with the if statement from the previous section, which results in this pretty thing:</p><pre><code class="language-yaml">${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Android'))) }}</code></pre><p>This can be improved, by creating a set-up job and moving the labels to variables, however this will be explained more in-depth in my next article as stated in the beginning.</p><h3 id="blocking-merging-when-the-ci-fails">Blocking merging when the CI fails</h3><p>Unfortunately, GitHub treats skipped jobs as failed, meaning that with status checks, only the KMP label would work correctly, all other labels would result in a blocked merge option, because some jobs were skipped.</p><p>This can be fixed by adding another job which runs after all other jobs complete:</p><pre><code class="language-yaml">jobs:
+  SetUp: # ...
+  Build: # ...
+  UnitTests: # ...
+  AllowMerge:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [ Build, UnitTests ]
+    steps:
+      - run: |
+          if [ ${{ github.event_name }} == pull_request ] &amp;&amp; [ ${{ join(github.event.pull_request.labels.*.name) == '' }} == true ]; then
+            exit 1
+          if [ ${{ (contains(needs.Build.result, 'failure')) }} == true ] || [ ${{ (contains(needs.UnitTests.result, 'failure')) }} == true ]; then
+            exit 1
+          else
+            exit 0
+          fi</code></pre><p>After this change, the GitHub repository can block merging when the AllowMerge doesn't pass.</p><figure class="kg-card kg-image-card"></figure><p>The first if statement ensures that any PR has at least one label, when it's missing a label, the run will fail. Thanks to this, the problem of human forgetfulness is out of the CI equation. When someone forgets to add the label, the PR won't be allowed to merge.</p><p>The second if statement verifies that there were no failures on any of the previous jobs. In case there was at least one failure, the PR will be blocked from merging. This should guarantee that no regressions can be introduced into the main branch (unless someone puts a wrong label on the PR).</p><div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text">Blocking merging when the CI fails is a good way to decrease the number of issues on the main branch. It gives us confidence, that at any point in time the main branch is working and can be more or less released.</div></div><h3 id="static-analysis-tools">Static analysis tools</h3><p>Using these types of tools as part of the Code Review workflow will keep the codebase more predictable and healthy. If you're interested in this topic, checkout my article on it:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../../konsist-and-ktlint-in-github-actions-continous-integration/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Adding Konsist and Ktlint to a GitHub Actions Continuous Integration</div><div class="kg-bookmark-description">Automating code and architecture checks in the Continuous Integration pipeline can significantly reduce Code Review time and prevent human forgetfulness.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"></div></a></figure><h2 id="extras">Extras</h2><h3 id="automated-labels">Automated Labels</h3><p>Depending on human memory isn't always the best way of doing things. Adding labels can be automated using the <a href="https://github.com/actions/labeler?ref=akjaw.com">Labeler</a> actions, to learn more click here:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../../kotlin-multiplatform-gha-automated-labels/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Multiplatform GitHub Actions Automated Pull Request Labels</div><div class="kg-bookmark-description">Having automated labels makes the Code Review process much safer by preventing merges for broken Pull Requests, ensuring that the main branch is stable</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"></div></a></figure><h3 id="gradle-caching">Gradle Caching</h3><p>Caching can be achieved using the official <a href="https://github.com/gradle/gradle-build-action?ref=akjaw.com">gradle-build-action</a>, which has a built-in caching system. The default behavior only saves the cache on the main branch, and other branches can only read from the cache.</p><p>This behavior can be customized, so the cache can be saved on multiple branches as specified in <a href="https://github.com/gradle/gradle-build-action?ref=akjaw.com#using-the-cache-read-only">the documentation</a>.</p><h3 id="concurrency">Concurrency</h3><p>A lot of time was spent optimizing the CI, to not run when not needed, e.g. when only changing Android, the iOS jobs shouldn't run. However, there is one more optimization which cancels any unneeded jobs.</p><p>By unneeded I mean a Code Review run which is not valid anymore, for example when a new commit was pushed on an opened PR. In that case, the currently running CI on the old commit should be stopped.</p><p>Fortunately, this functionality is <a href="https://docs.github.com/en/actions/using-jobs/using-concurrency?ref=akjaw.com">supported in GitHub Actions</a>:</p><pre><code class="language-yaml">name: Code review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}</code></pre><p>These 3 lines, will automatically cancel any jobs which will be replaced by new ones, potentially saving a lot of unnecessary "billing minutes".</p><h3 id="course">Course</h3><p>I'm a co-author of an Android course which goes more in-depth into CI/CD for Android like, the above Code Review, Manual builds for testers, Release builds, Nightly verification and more. Currently, the course is only available in Polish, but there is a waitlist for those interested in an English version of it, so feel free to check it out if you're interested!</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../../android-next-level/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Android Next Level</div><div class="kg-bookmark-description">A course about processes outside of coding like: CI/CD, scaling your project, good git hygiene or how to cooperate with your teammates</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"></div></a></figure>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>

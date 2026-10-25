@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>21 Testing Mistakes - Part 2</title>
+
+    <meta name="description" content="The second part of my Testing Mistakes series">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/testing-mistakes-part-2/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="21 Testing Mistakes - Part 2">
+    <meta property="og:description" content="The second part of my Testing Mistakes series">
+    <meta property="og:url" content="https://akjaw.com/testing-mistakes-part-2/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2023/04/hero-part2-1.png">
+    <meta property="article:published_time" content="2023-04-07T06:00:00.000Z">
+    <meta property="article:modified_time" content="2025-04-22T06:01:40.000Z">
+    <meta property="article:tag" content="Testing">
+    <meta property="article:tag" content="Kotlin">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="21 Testing Mistakes - Part 2">
+    <meta name="twitter:description" content="The second part of my Testing Mistakes series">
+    <meta name="twitter:url" content="https://akjaw.com/testing-mistakes-part-2/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2023/04/hero-part2-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Testing, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="643">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "21 Testing Mistakes - Part 2",
+    "url": "https://akjaw.com/testing-mistakes-part-2/",
+    "datePublished": "2023-04-07T06:00:00.000Z",
+    "dateModified": "2025-04-22T06:01:40.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2023/04/hero-part2-1.png",
+        "width": 1200,
+        "height": 643
+    },
+    "keywords": "Testing, Kotlin",
+    "description": "The second part of my Testing Mistakes series",
+    "mainEntityOfPage": "https://akjaw.com/testing-mistakes-part-2/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">21 Testing Mistakes - Part 2</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2023-04-07">07 Apr 2023</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2023/04/hero-part2-1.png" width="600" height="340" layout="responsive" 
+                alt="21 Testing Mistakes - Part 2"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">This part focuses on6. Overusing mock frameworks7. Testing implementation details instead of the outcome8. Comparing whole complex data structures instead of only the tested fields9. Not using Soft assertions10. Repeating the SUT Algorithm in assertions instead of an explicit value</div></div><div class="kg-card kg-callout-card kg-callout-card-grey"><div class="kg-callout-emoji">🔗</div><div class="kg-callout-text"><a href="../../5-beginner-testing-mistakes-i-noticed-while-working-with-less-experienced-developers/">First part</a><a href="../../testing-mistakes-part-2/">Second part</a><a href="../../testing-mistakes-part-3/">Third part</a><a href="../../testing-mistakes-part-4/">Fourth part</a></div></div><h2 id="6-overusing-mock-frameworks">6. Overusing mock frameworks</h2><p>Let me start off by saying, I'm not a big fan of mock frameworks because, <strong>they</strong> <strong>increase the test suite run-time</strong> <strong>and</strong> <strong>usually decrease re-usability by repeating the same mock set-up</strong> instead of creating one re-usable test double. </p><p>This repeated mock framework boilerplate, sooner or later, will break in a lot of places when something changes (e.g. its contract). <strong>This is the exact opposite of what we do in production code (keeping things DRY).</strong> However, having a re-usable test double follows that good practices, because we don't repeat ourselves.</p><p>These <strong>handwritten test doubles are written by us, and can be extended to suit our needs</strong>. For example, we could have additional functions which we can use for verification avoiding some boilerplate and protect ourselves from additional changes:</p><pre><code class="language-kotlin">class FakeNavigator : Navigator {
+
+  var commands: List&lt;NavigationCommand&gt; = emptyList()
+  
+  override fun navigate(command: NavigationCommand) {
+    commands.add(command)
+  }
+
+  fun assertLatestCommandEquals(item: Item) {
+    assertEquals(item, commands.last())
+  }
+}</code></pre><p><strong>Another thing with mocking frameworks is that they are also easy to misuse by testing implementation details of the SUT instead of its behavior / outcome</strong>. This in turn leads to brittle test suites that break frequently when changing some implementation details even though the behavior stays the same. I will elaborate on this more in the next point.</p><p>I do see the benefit of mocking frameworks and use them sometimes, however in my opinions they have more downsides than upsides. If you want to keep using mocking frameworks, go ahead. My only suggestion would be that <strong>if you have classes / interfaces which are mocked frequently, create a Mock Wrapper or a Test Double by hand</strong>, it will keep your test code DRY and encourage more re-usability.</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://medium.com/@june.pravin/mocking-is-not-practical-use-fakes-e30cc6eaaf4e?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Mocking is not practical — Use fakes</div><div class="kg-bookmark-description">This article talks about the benefits fakes provide over mocks in testing software. Fakes lead to better API and readable/robust tests.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">Medium</span><span class="kg-bookmark-publisher">Pravin Sonawane</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://miro.medium.com/max/1200/1*4qqr5y8GshK987Dvm7DgEA.jpeg" alt="" width="1200" height="1800" layout="responsive"></amp-img></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://ryanharter.com/blog/2020/06/replacing-mocks/?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Replacing Mocks :: Ryan Harter</div><div class="kg-bookmark-description">After reading a recent post by Sam Edwards detailing how he wraps mock objects for tests, I had a good discussion with him and others about the alternative: simply making Fake implementations.</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">Replacing Mocks</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://ryanharter.com/img/favicon/orange.png" alt="" width="50" height="50" layout="fixed"></amp-img></div></a></figure><figure class="kg-card kg-embed-card"><div class="reddit-embed" data-embed-media="www.redditmedia.com" data-embed-parent="false" data-embed-live="false" data-embed-uuid="6b6f0944-9cd3-11ed-81b7-b29a427397ea" data-embed-created="2023-01-25T17:12:17.280996+00:00"><a href="https://www.reddit.com/r/androiddev/comments/d05di8/do_you_use_the_impl_suffix_if_you_only_have_one/ez86bi3/?ref=akjaw.com">Comment</a> from discussion <a href="https://www.reddit.com/r/androiddev/comments/d05di8/do_you_use_the_impl_suffix_if_you_only_have_one/?ref=akjaw.com">m0zzie's comment from discussion "Do you use the Impl suffix if you only have one concrete class on your interface?"</a>.</div></figure><h2 id="7-testing-implementation-details-instead-of-the-outcome">7. Testing implementation details instead of the outcome</h2><p>Before delving into the details, I want to point out that the popular "mock" represents all form of test doubles: Fakes, Stubs, Spies etc. Because of this, it's hard to differentiate between different types of test doubles. In most cases, a Stub or a Fake should cover most of the needs, however with mock frameworks, usually everything becomes a mock.</p><p><strong>Mock verification can lead to brittle tests when it is not used correctly</strong>. Let me show you this through a SUT which retrieves items from a database:</p><pre><code class="language-kotlin">@Test
+fun databaseIsCalledWhenRetrievingItems() {
+    sut.getItems()
+
+    verify {
+        mockDatabase.getAll()
+    }
+}</code></pre><p>The test passes, so this means that everything works, right? Well, not exactly, <strong>we just verify the implementation details that the database was called, not that its return value is used</strong>. The following implementation passes, but it doesn't exactly behave how we expect:</p><pre><code class="language-kotlin">class SystemUnderTest(private val database: Database) {
+    
+    fun getItems(): List&lt;Items&gt; {
+        database.getAll()
+        return emptyList()
+    }
+}</code></pre><p>A better way to test this would be to use the "Stubbing" functionality that most mock frameworks provide:</p><pre><code class="language-kotlin">@Test
+fun databaseItemsAreRetrieved() {
+    val items = listOf(Item("1"), Item("2"))
+    every { mockDatabase.getAll() } returns items
+    
+    val result = sut.getItems()
+
+    assertEquals(items, result)
+}</code></pre><p>The test above doesn't verify that the database was called directly, it simply checks if the SUT returned value is the same as what we set up in the mock. <strong>This way we actually verify the behavior of the SUT which is "returning items from a database" not just the implementation details</strong>. I know that the above example is really trivial, but I just wanted to get the point across, and believe me, I sometimes see the test suites where most of the focus is on the implementation details, instead of the behavior of the SUT.</p><p><strong>In most cases, it's better to set up return values and verify that the SUT uses them correctly, instead of just checking if a function was called</strong>. However, there are cases where we want to verify that some function was called a certain amount of times, for example when checking if a function correctly returns early in some conditions. In these situations verifying the number of calls is fine, because it is part of the SUT behavior, e.g. "It shouldn't call the API again if the previous request was a success".</p><p>In the above database example, instead of using a mocking framework to set up the return value, I would simply create a FakeDatababase, which will probably be an in-memory database that behaves like the real implementation:</p><pre><code class="language-kotlin">interface Database {
+    fun getAll(): List&lt;Item&gt;
+    
+    fun addItem(item: Item)
+}
+
+interface FakeDatabase : Database {
+    var items: List&lt;Item&gt; = emptyList()
+
+    override fun getAll(): List&lt;Item&gt; = items
+
+    override fun addItem(item: Item) {
+        items.add(item)
+    }
+}
+
+@Test
+fun databaseItemsAreRetrieved() {
+    val items = listOf(Item("1"), Item("2"))
+    fakeDatabase.items = items
+
+    val result = sut.getItems()
+
+    assertEquals(items, result)
+}</code></pre><p><strong>This fake implementation can be easily re-used across multiple tests, and makes the test code work closer to how the production code does it.</strong> That is because we're still using a database, but it is just an in-memory one.</p><p>If you're interested about different types of Test Doubles and their purpose, checkout this write-up:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://martinfowler.com/bliki/TestDouble.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">bliki: TestDouble</div><div class="kg-bookmark-description">Test Double is generic term for fakes, mocks, stubs, dummies and spies.</div><div class="kg-bookmark-metadata"><amp-img class="kg-bookmark-icon" src="https://martinfowler.com/favicon.ico" alt="" width="256" height="256" layout="fixed"></amp-img><span class="kg-bookmark-author">martinfowler.com</span><span class="kg-bookmark-publisher">Martin Fowler</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://martinfowler.com/logo-sq.png" alt="" width="144" height="144" layout="fixed"></amp-img></div></a></figure><h2 id="8-comparing-whole-complex-data-structures-instead-of-only-the-tested-fields">8. Comparing whole complex data structures instead of only the tested fields</h2><p>A lot of tests verify correctness by comparing Data Structures, usually as a result of some conversion from another type (e.g. from API or Database). However, sometimes the data structure has fields that have some complex logic behind them.</p><p><strong>Ideally, such complex logic should be tested in isolation. Otherwise, changes in unrelated parts could cause the complex logic tests to fail, even though they should pass.</strong></p><p>For arguments’ sake, take a look at this example, which uses some hidden logic for determining a Person's Title</p><pre><code class="language-kotlin">enum Title { Mr, Mrs, Ms, Miss }
+
+data class Person(
+    val name: String,
+    val age: Int,
+    val title: Title,
+)
+
+fun createPerson(name: String, age: String): Person {
+    // name and age is just assigned as is
+    // title is calculated based on age and name
+}
+
+@Test
+fun bobAge5IsCorrectlyCreated() {
+    val result = createPerson("Bob", 5)
+
+    val expectedResult = Person("Bob", 5, Title.Mr)
+    assertEquals(expectedResult, result)
+}
+
+@Test
+fun bethanyAge30IsCorrectlyCreated() {
+    val result = createPerson("Bethany", 30)
+
+    val expectedResult = Person("Bethany", 30, Title.Mrs)
+    assertEquals(expectedResult, result)
+}
+
+...
+
+</code></pre><p>As you can see, every test repeats the assertions for the name and age property. If we were to add a new property the Person structure, all tests would need to be updated to include that property, and if the new field is complex then every test would need to take care of using the correct value.</p><p>A better way to test this logic would be to have one test that verifies the simple fields, and the rest would focus on the complex title logic</p><pre><code class="language-kotlin">@Test
+fun simplePropertiesAreCorrectlyCreated() {
+    val result = createPerson("Bob", 5)
+
+    assertEquals("Bob", result.name)
+    assertEquals(5, result.age)
+}
+
+@Test
+fun bobAge5HasCorrectTitle() {
+    val result = createPerson("Bob", 5)
+
+    assertEquals(Title.Mr, result.title)
+}
+
+@Test
+fun bethanyAge30HasCorrectTitle() {
+    val result = createPerson("Bob", 5)
+
+    assertEquals(Title.Mrs, result.title)
+}
+
+...</code></pre><p><strong>This way, the complex logic has granular tests which should be less brittle and not tied up with other irrelevant logic</strong>. However, this is a double-edged sword, because while the tests are more resilient, they won't detect if a new field is added. This is up to the developer to remember about it, and add tests for it, either by adding another assertion to the simple Properties test, or by adding a couple tests is the field is more complex.</p><h2 id="9-not-using-soft-assertions">9. Not using Soft assertions</h2><p><strong>Sometimes in tests we want to make assertions on a couple of fields</strong>, either because they are part of the same behavior, or they are so simple, that we don't want to bother with adding separate tests for all of them. Or sometimes the field is more complex, and we want to verify its type, nullability etc.</p><p>Usually assertions throw an error, meaning that if we have multiple assertions, when something fails the rest of the assertions won't execute:</p><pre><code class="language-Kotlin">data class Pet(
+    val name: String,
+    val age: Int, 
+)
+
+@Test
+fun multipleFieldsAreCorrect() {
+    ...
+    assertEquals("Kitty", result.name)
+    assertEquals(3, result.age)
+}</code></pre><p>In the above example, if the name is incorrect, the age won't even be verified, so we're not sure if the age was correct or not. To help with this issue, we can use soft assertions:</p><pre><code class="language-kotlin">@Test
+fun multipleFieldsAreCorrect() {
+    ...
+    assertSoftly {
+        result.name shouldBe "Kitty"
+        result.age shouldBe 3
+    }
+}</code></pre><p><strong>With soft assertions, everything will be checked first, and then the test will fail</strong>. In the above example, if the name is invalid, the age is still verified, and we get a full report of what's incorrect:</p><pre><code class="language-kotlin">io.kotest.assertions.MultiAssertionError: 
+The following 2 assertions failed:
+1) expected:&lt;"Kitty"&gt; but was:&lt;"Cat"&gt;
+	at com.akjaw.example.Test.multipleFieldsAreCorrect(Test.kt:125)
+2) expected:&lt;3&gt; but was:&lt;4&gt;
+	at com.akjaw.example.Test.multipleFieldsAreCorrect(Test.kt:126)
+</code></pre><p>Most assertions frameworks have soft assertions which you can use in your tests, the above example uses <a href="https://kotest.io/docs/assertions/soft-assertions.html?ref=akjaw.com">Kotest assertions</a>.</p><p>Another example where I like to use soft assertions is for the type of the class (a Kotlin sealed class in this example)</p><pre><code class="language-kotlin">sealed class Pet {
+    data class Cat(val name: String, val age: Int) : Pet()
+    data class Dog(val name: String) : Pet()
+}
+
+@Test
+fun catIsCorrect() {
+    ...
+    assertSoftly {
+        result.shouldBeInstanceOf&lt;Pet.Cat&gt;()
+        result.name shouldBe "Kitty"
+        result.age shouldBe 3
+    }
+}</code></pre><p>shouldBeInstanceOf asserts the type along with smart casting it, meaning that the result variable will behave like it was the Pet.Cat type allowing access to all the Pet.Cat specific fields.</p><h2 id="10-repeating-the-sut-algorithm-in-assertions-instead-of-an-explicit-value">10. Repeating the SUT Algorithm in assertions instead of an explicit value</h2><p>Sometimes when writing tests, we want to go the easy way, and make them as simple to write as possible. <strong>This laziness can lead to tests which have assertions that mirror the implementation details / algorithm of the class we want to test</strong>.</p><pre><code class="language-kotlin">class Stringifier {
+    fun execute(list: List&lt;Int&gt;): String =
+        list.joinToString("|")
+}
+
+class StringifierTest {
+
+    @Test
+    fun stringifyReturnsTheValuesSeparatedByPipe() {
+        val input = listOf(1, 2, 3, 4, 5)
+        val systemUnderTest = Stringifier()
+
+        val result = systemUnderTest.execute(input)
+
+        result shouldBe input.joinToString("|")
+    }
+}</code></pre><p>In the above example, the assertions are the same as the SUT algorithm, and it makes the test pass. However, <strong>for more complex cases these assertions are hard to understand and sometimes require a debugging session to just understand </strong>what is the expected outcome. </p><p>This confusion makes the tests harder to understand, and if we were to refactor the algorithm to use a different function. The result would be a hard-to-understand test which doesn't even match what the system under test is doing. A better way of doing this would be:</p><pre><code class="language-kotlin">@Test
+fun stringifyReturnsTheValuesSeparatedByPipe() {
+    val input = listOf(1, 2, 3, 4, 5)
+    val systemUnderTest = Stringifier()
+
+    val result = systemUnderTest.execute(input)
+
+    result shouldBe "1|2|3|4|5"
+}
+</code></pre><p><strong>This explicit assertion value makes it easy to understand what the SUT does. </strong>Additionally, we don't have to wonder about some aspects of how the SUT works, e.g: will there be pipes at the beginning or end?</p>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>

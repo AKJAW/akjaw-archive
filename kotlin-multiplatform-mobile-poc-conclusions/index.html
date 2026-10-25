@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">		<link rel="preconnect" href="../">
+        <link href="../assets/css/screen.min.css" rel="stylesheet">
+		<script>
+    if(typeof(Storage) !== 'undefined') {
+        let themeMode = document.documentElement.getAttribute('data-theme');
+        if (themeMode !== null && themeMode === 'system') {
+            setSysPrefColor();
+        }
+        const theme = localStorage.getItem('selected-theme');
+        if (theme == 'light') {
+            setColorScheme('light');
+        }
+        else if (theme == 'dark') {
+            setColorScheme('dark');
+        }
+    }
+    function setSysPrefColor() {
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+            setColorScheme('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+            if (e.matches) {
+                setColorScheme('dark');
+            } else {
+                setColorScheme('light');
+            }
+        });
+    }
+    function setColorScheme(scheme) {
+        if (scheme=='dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+</script>		<meta name="description" content="This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.">
+    <link rel="icon" href="../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/kotlin-multiplatform-mobile-poc-conclusions/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="amp/">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions">
+    <meta property="og:description" content="This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.">
+    <meta property="og:url" content="https://akjaw.com/kotlin-multiplatform-mobile-poc-conclusions/">
+    <meta property="og:image" content="https://akjaw.com/content/images/size/w1200/2021/07/multiplatform.png">
+    <meta property="article:published_time" content="2021-07-30T16:02:21.000Z">
+    <meta property="article:modified_time" content="2023-09-02T11:42:54.000Z">
+    <meta property="article:tag" content="Multiplatform">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="iOS">
+    <meta property="article:tag" content="Kotlin">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions">
+    <meta name="twitter:description" content="This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.">
+    <meta name="twitter:url" content="https://akjaw.com/kotlin-multiplatform-mobile-poc-conclusions/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/size/w1200/2021/07/multiplatform.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Multiplatform, Android, iOS, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions",
+    "url": "https://akjaw.com/kotlin-multiplatform-mobile-poc-conclusions/",
+    "datePublished": "2021-07-30T16:02:21.000Z",
+    "dateModified": "2023-09-02T11:42:54.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/size/w1200/2021/07/multiplatform.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Multiplatform, Android, iOS, Kotlin",
+    "description": "This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.",
+    "mainEntityOfPage": "https://akjaw.com/kotlin-multiplatform-mobile-poc-conclusions/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer src="../public/cards.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../public/cards.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    .post-content > * {
+        margin-bottom: 3rem;
+    }
+    .post-content p + ul {
+        margin-top: -2rem;
+    }
+    .post-content p + .kg-code-card, .post-content p + pre[class*=language-] {
+        margin-top: -1rem;
+    }
+	#hyvor-talk-view .reactions-title {
+        color: #cac7c7;
+     }
+    code[class*=language-], pre[class*=language-] {
+        font-size: 16px;   
+    }
+    .share-wrap {
+        margin-bottom: 0rem;
+        margin-top: 2rem;
+    }
+    .newsletter-section input {
+        border-radius: 32px !important;
+        background: var(--body-bg) !important;
+        border: 1px solid var(--c-border) !important;
+        color: var(--c-text-main) !important;
+        font-weight: 500 !important;
+        padding: 0 2rem !important;
+        font-size: 1.235rem !important;
+    }
+    .newsletter-section input::placeholder {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section #mlb2-4433281.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section #mlb2-4433284.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section .ml-form-embedWrapper {
+        border-radius: 24px !important;
+		background-color: transparent !important;
+        border: 3px solid var(--c-theme) !important;
+    }
+    .newsletter-section .ml-form-embedWrapper p, .newsletter-section .ml-form-embedWrapper h4  {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section .ml-field-email input {
+        height: 56px;
+    }
+    .ml-field-email input {
+        height: inherit;
+    }
+    .post-sneak-peek {
+        position: relative;
+    }
+    .post-sneak-peek.fading:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 50%;
+        background: linear-gradient(transparent, var(--c-body-bg) 90%);
+    }
+</style> 
+
+<script>
+	var apiKey = "a36b1ce3f8a442ba78f296c798";
+</script><style>:root {--ghost-accent-color: #526e8b;}</style>
+	</head>
+	<body class="post-template tag-multiplatform tag-android tag-ios tag-kotlin" data-nav="sticky-hide" data-search="Third party search">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="global-icons" style="display:none">
+    <symbol id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.083 17.196l4.526 4.528A1.332 1.332 0 0122.667 24a1.33 1.33 0 01-.943-.39l-4.528-4.527a10.602 10.602 0 01-6.53 2.25C4.787 21.333 0 16.548 0 10.667 0 4.785 4.785 0 10.667 0c5.881 0 10.666 4.785 10.666 10.667 0 2.461-.846 4.724-2.25 6.529zm-8.416-14.53c-4.412 0-8 3.589-8 8 0 4.413 3.588 8 8 8s8-3.587 8-8c0-4.411-3.588-8-8-8z"/></symbol>
+    <symbol id="i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.036 7.976a.75.75 0 00-1.06 1.06L10.939 12l-2.963 2.963a.75.75 0 101.06 1.06L12 13.06l2.963 2.964a.75.75 0 001.061-1.06L13.061 12l2.963-2.964a.75.75 0 10-1.06-1.06L12 10.939 9.036 7.976z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></symbol>
+    <symbol id="i-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="person"><rect opacity="0"/><path d="M12 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/><path d="M18 21a1 1 0 0 0 1-1 7 7 0 0 0-14 0 1 1 0 0 0 1 1z"/></g></g></symbol>
+    <symbol id="i-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.228 23.999l.114.001a12.31 12.31 0 008.762-3.624 12.269 12.269 0 002.803-4.315 1.2 1.2 0 00-1.531-1.557c-3.678 1.339-7.836.426-10.593-2.326a10.078 10.078 0 01-2.33-10.564A1.2 1.2 0 007.899.08a12.271 12.271 0 00-4.792 3.292c-4.24 4.722-4.103 12.278.31 16.843A12.311 12.311 0 0012.227 24zM4.892 4.975a9.882 9.882 0 011.65-1.474c-.475 3.772.797 7.633 3.544 10.376 2.75 2.743 6.62 4.008 10.394 3.538-.32.448-.678.87-1.071 1.262A9.932 9.932 0 0112.34 21.6l-.092-.001a9.928 9.928 0 01-7.109-3.053C1.585 14.868 1.473 8.78 4.892 4.975z"/></symbol>
+    <symbol id="i-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8 1.2v2.4a1.2 1.2 0 102.4 0V1.2a1.2 1.2 0 10-2.4 0zM18.876 7.028a1.195 1.195 0 01-1.697-.03 1.2 1.2 0 01.029-1.696l1.727-1.668a1.202 1.202 0 011.668 1.728l-1.727 1.666zM12 16.8c2.647 0 4.8-2.153 4.8-4.8S14.647 7.2 12 7.2A4.805 4.805 0 007.2 12c0 2.647 2.153 4.8 4.8 4.8zM5.124 16.972l-1.727 1.666a1.2 1.2 0 001.668 1.728l1.727-1.668a1.2 1.2 0 00-1.668-1.726zM17.18 17.002c.46-.477 1.22-.49 1.696-.03l1.727 1.666a1.2 1.2 0 01-1.668 1.728l-1.727-1.668a1.2 1.2 0 01-.029-1.696zM12 19.2a1.2 1.2 0 00-1.2 1.2v2.4a1.2 1.2 0 102.4 0v-2.4a1.2 1.2 0 00-1.2-1.2zM5.065 3.634a1.2 1.2 0 00-1.668 1.728l1.727 1.666a1.195 1.195 0 001.697-.03 1.2 1.2 0 00-.029-1.696L5.065 3.634zM3.6 10.8a1.2 1.2 0 110 2.4H1.2a1.2 1.2 0 110-2.4h2.4zM22.8 10.8h-2.4a1.2 1.2 0 100 2.4h2.4a1.2 1.2 0 100-2.4z"/></symbol>
+    <symbol id="i-twitter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></symbol>
+    <symbol id="i-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></symbol>
+</svg>		<div class="site-wrap">
+		<header class="site-header has-theme-icon">
+    <div class="header-inner flex justify-space-between">
+        <div class="header-logo flex">
+            <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+        </div>
+
+        <input id="mobile-menu-toggle" class="mobile-menu-checkbox" type="checkbox">
+        <label for="mobile-menu-toggle" class="mobile-menu-icon" aria-label="menu toggle button">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="sr-only">Menu toggle button</span>
+        </label>
+
+            <nav class="nav-wrap flex" role="navigation" aria-label="Main navigation">
+        <ul class="nav-left no-style-list" role="menu">
+            <li class="nav-item" role="menuitem">
+                <a href="../talks/" class="nav-link">Talks</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/multiplatform/" class="nav-link">Kotlin Multiplatform</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/testing/" class="nav-link">Testing</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../about-me/" class="nav-link">About me</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../iryzyko/" class="nav-link">iRyzyko</a>
+            </li>
+        </ul>
+
+        
+        <div class="icons-wrap">
+            <button href="javascript:;" class="nav-icon search-icon flex js-search-button">
+                <svg><use xlink:href="#i-search"/></svg>
+            </button>
+                        <a href="javascript:;" class="nav-icon theme-icon flex js-toggle-dark-light" aria-label="Toggle theme">
+                <div class="toggle-mode flex">
+                    <span class="light"><svg><use xlink:href="#i-sun"/></svg></span>
+                    <span class="dark"><svg><use xlink:href="#i-moon"/></svg></span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    </div>
+</header>		
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <article class="single-post post-card">
+                    <header class="post-header">
+                        <div class="tag-wrap">
+                            <a href="../tag/multiplatform/"  style="--c-theme:#7b4fff;">Multiplatform</a>
+                            <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                            <a href="../tag/ios/" >iOS</a>
+                            <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                        </div>
+                        <h1 class="heading-large post-title">
+                            Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions
+                        </h1>
+                        <div class="custom-excerpt">
+                            This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.
+                        </div>
+                        <div class="post-meta-wrap flex">
+    <div class="author-avatar-wrap">
+        <a href="../author/aleksander/" class="author-image">
+            <img src="../content/images/size/w150/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski">
+        </a>
+    </div>
+    <div class="meta-info">
+        <div class="author-names">
+            
+            <a href="../author/aleksander/">Aleksander Jaworski</a>
+        </div>
+        <div class="date-time">
+            <time class="post-date" datetime="2021-07-30">Jul 30, 2021</time>
+            <span class="read-time">10 min read</span>
+        </div>
+    </div>
+</div>                    </header>
+                    <div class="featured-image-wrap">
+                        <img class="featured-image" loading="lazy"
+                            srcset="../content/images/size/w300/2021/07/multiplatform.png 300w,
+                               ../content/images/size/w600/2021/07/multiplatform.png 600w,
+                              ../content/images/size/w1200/2021/07/multiplatform.png 1200w,"
+                            sizes="(max-width: 340px) 300px, (max-width: 640px) 600px, 1200px"
+                            src="../content/images/size/w1200/2021/07/multiplatform.png" alt="Building a Kotlin Multiplatform Mobile Proof of Concept Conclusions">
+                    </div>
+                    <div class="featured-image-caption text-center"></div>
+                    <div class="post-content">
+                        <p>Currently, we're planning a rebuild of our apps using the <a href="https://kotlinlang.org/docs/multiplatform.html?ref=akjaw.com">Kotlin Multiplatform</a>, <a href="https://developer.android.com/jetpack/compose?ref=akjaw.com">Jetpack Compose</a> and <a href="https://developer.apple.com/xcode/swiftui/?ref=akjaw.com">Swift UI</a> for Android and iOS respectively. This article contains information about our experiences with Kotlin Multiplatform, which hopefully might be useful for others.</p><p>The <a href="https://github.com/touchlab/KaMPKit?ref=akjaw.com">Touchlab KaMPKit</a> project was used as the starter for the Proof of Concept.</p><h2 id="the-proof-of-concept-architecture-">The Proof Of Concept Architecture:</h2><p>The platforms communicate with the KMP module using use cases. However, we are thinking that maybe exposing an interface that groups related features might be beneficial. The implementation would still call the use cases underneath, however such an interface would help with creating Kotlin / Native wrappers (explained later).</p><p>This means that the Presentation layer is also implemented on both platforms. We feel that this gives us more control of how we integrate the platforms with Kotlin Multiplatform.</p><h2 id="kotlin-multiplatform-">Kotlin Multiplatform:</h2><h4 id="kotlin-native-different-threading-model-">Kotlin / Native different threading model:</h4><p>This is probably the biggest hurdle we've faced when working on the POC. Kotlin / Native is very restrictive when it comes to sharing classes between threads, whereas Kotlin / JVM is not. </p><p>The oversimplified version is that when referencing a class from a different thread the whole class becomes frozen along with its dependencies, meaning that they cannot be mutated / changed anymore. </p><p>At first, it seemed counterproductive and a burden, but after reading some resources around the topic, we've found that this restriction makes the code more predictable when it comes to multi-threading. Big shout out to <a href="https://github.com/kpgalligan?ref=akjaw.com">Kevin Galligan</a> and <a href="https://touchlab.co/?ref=akjaw.com">Touchlab</a> for creating so many resources around the topic.</p><p>This new threading model forced us to separate the long-lasting logic into self-contained classes which switch the threads and the return a result without freezing any unwanted classes.</p><h4 id="preventing-accidental-freezing-of-classes">Preventing accidental freezing of classes</h4><p>Classes which are mutable or classes that have mutable dependencies cannot be frozen. If this happens, the moment that a mutation will take place an InvalidMutabilityException will be thrown. </p><p>To prevent this, Kotlin / Native exposes a function called <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.native.concurrent/ensure-never-frozen.html?ref=akjaw.com">ensureNeverFrozen()</a>. This function throws a FreezingException when the class gets frozen, with a verbose stack trace that helps debug where the freeze started.</p><p>This function and other related to freezing are only available on Kotlin / Native which makes  them unavailable in the common code. The easiest way to get around this is using the <a href="https://github.com/touchlab/Stately?ref=akjaw.com#stately-common">Stately-common library</a>.</p><p>Writing integration tests in which only the boundary dependencies are replaced (Database, API) helped catch FreezingException in a much faster feedback loop than running the iOS app. Here are some resources related to the threading model and freezing that helped us tremendously.</p><figure class="kg-card kg-embed-card"><iframe width="200" height="113" src="https://www.youtube.com/embed/oxQ6e1VeH4M?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://kotlinlang.org/docs/mobile/concurrency-overview.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Concurrency overview | Kotlin Multiplatform Mobile Docs</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://kotlinlang.org/assets/images/apple-touch-icon-144x144.png?v2" alt=""><span class="kg-bookmark-author">Kotlin Multiplatform Mobile Docs Help</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://kotlinlang.org/docs/mobile/images/freezing-state.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://kotlinlang.org/docs/native-concurrency.html?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Concurrency in Kotlin/Native | Kotlin</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://kotlinlang.org/assets/images/apple-touch-icon-144x144.png?v2" alt=""><span class="kg-bookmark-author">Kotlin Help</span></div></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://play.kotlinlang.org/hands-on/Kotlin%20Native%20Concurrency/00_Introduction?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Playground: Edit, Run, Share Kotlin Code Online</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://play.kotlinlang.org/assets/apple-touch-icon-1024x1024.png" alt=""><span class="kg-bookmark-author">Kotlin Playground: Edit, Run, Share Kotlin Code Online</span></div></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://dev.to/touchlab/kotlin-native-isolated-state-50l1?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin/Native - Isolated State</div><div class="kg-bookmark-description">You can have concurrent mutable state with reasonable performance by keeping it isolated to a single thread.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://res.cloudinary.com/practicaldev/image/fetch/s--t7tVouP9--/c_limit,f_png,fl_progressive,q_80,w_192/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png" alt=""><span class="kg-bookmark-author">DEV Community</span><span class="kg-bookmark-publisher">Kevin Galligan</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://dev.to/social_previews/article/248950.png" alt=""></div></a></figure><h4 id="exposing-coroutines-and-flows-to-kotlin-native">Exposing coroutines and Flows to Kotlin / Native</h4><p>Coroutines can be called from Swift given a completionHandler closure is provided with two parameters, one for the success data and one for an error.  The problem is that the second parameter for the error only "catches" cancellation exceptions, all other errors thrown from the coroutine will need to be caught. Catching Kotlin errors from Swift is awkward and might get out of hand quickly, a better solution is to create a wrapper:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://dev.to/touchlab/working-with-kotlin-coroutines-and-rxswift-24fa?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Working with Kotlin Coroutines and RxSwift</div><div class="kg-bookmark-description">A recent client engagement involved interop between Kotlin coroutines in shared code, and RxSwift on...</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://res.cloudinary.com/practicaldev/image/fetch/s--t7tVouP9--/c_limit,f_png,fl_progressive,q_80,w_192/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png" alt=""><span class="kg-bookmark-author">DEV Community</span><span class="kg-bookmark-publisher">Russell Wolf</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--leSGoeMh--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/i/8ak1vwmp8s17klba2ng5.png" alt=""></div></a></figure><p>Like the articles state, the wrappers require additional layer/layers, but it makes using Kotlin from Swift much simpler and easier. As for coroutines the wrapper makes error handling more explicit by providing two closures / lambdas (for success or failure) additionally it also makes thread switching easier.</p><p>Exposing Flows is more complicated because it is a continuous stream of data unlike coroutines, Swift cannot use flows without a wrapper. The simplest option is the so called "CommonFlow" which allows Swift code to pass a closure which is called every time the flow emits an item. </p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://stackoverflow.com/questions/64175099/listen-to-kotlin-coroutine-flow-from-ios?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Listen to Kotlin coroutine flow from iOS</div><div class="kg-bookmark-description">I have setup a Kotlin Multiplatform project and attached a SQLDelight database to it. Its all setup and running correctly as i have tested it on the android side using the following:commonMain: ...</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png?v&#x3D;c78bd457575a" alt=""><span class="kg-bookmark-author">Stack Overflow</span><span class="kg-bookmark-publisher">Wazza</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon@2.png?v&#x3D;73d79a89bded" alt=""></div></a></figure><p>This solution however omits error handling, which is not ideal for production use, but it is nice for getting things started quickly.</p><p>More robust solutions can be found here:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://johnoreilly.dev/posts/kotlinmultiplatform-swift-combine_publisher-flow/?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Wrapping Kotlin Flow with Swift Combine Publisher in a Kotlin Multiplatform project · John O’Reilly</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://johnoreilly.dev/public/apple-touch-icon-144-precomposed.png" alt=""></div></div><div class="kg-bookmark-thumbnail"><img src="https://johnoreilly.dev/public/profile_photo.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://dev.to/touchlab/kotlin-coroutines-and-swift-revisited-j5h?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Coroutines and Swift, revisited</div><div class="kg-bookmark-description">Last year I wrote about a pattern for interop between Kotlin coroutines and RxSwift. I appreciate the...</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://res.cloudinary.com/practicaldev/image/fetch/s--t7tVouP9--/c_limit,f_png,fl_progressive,q_80,w_192/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png" alt=""><span class="kg-bookmark-author">DEV Community</span><span class="kg-bookmark-publisher">Russell Wolf</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--owfNkc3W--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o30y9ev9beqvbqsxmz5b.jpg" alt=""></div></a></figure><p>We've opted to use the flow wrappers that <a href="https://github.com/russhwolf?ref=akjaw.com">Russell Wolf</a> suggested in his article.</p><h4 id="kotlin-native-coroutinesinternalerror">Kotlin / Native CoroutinesInternalError</h4><p>During development, we came across a weird error:</p><p><code>Uncaught Kotlin exception: kotlinx.coroutines.CoroutinesInternalError: Fatal exception in coroutines machinery for DispatchedContinuation[MainDispatcher, Continuation @ $start$lambda-1COROUTINE$19]. Please read KDoc to 'handleFatalException' method and report this incident to maintainers</code></p><p>However, down the stack there is a more helpful message:</p><p><code>Caused by: kotlin.native.concurrent.FreezingException: freezing of Continuation @ $start$lambda-1$lambda-0COROUTINE$18 has failed</code></p><p>A CoroutineExceptionHandler can also be used to give a more clear error message:</p><pre><code class="language-kt">private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable -&gt;
+	println(throwable.stackTraceToString())
+}</code></pre><p>The CoroutinesInternalError might be caused by the CFRunLoopRun (at least in tests).</p><h4 id="error-handling">Error Handling</h4><p>For ease of use, it is better to handle as much error handling as it is possible in Kotlin. The previously mentioned coroutine and flow wrappers make it easier to integrate error handling in Swift.</p><h4 id="testing">Testing</h4><p>Testing is a crucial part of the Kotlin Multiplatform module, especially when it comes to the Kotlin / Native threading. The strategy we used for writing tests is using real dependencies where we only replace boundary dependencies (Database, API, Socket etc.) with test doubles. </p><p>Thanks to this, any concurrency / freezing / mutability exceptions will be caught by the tests before running the iOS app. This speeds up the feedback loop significantly, as running the app takes much longer.</p><p>In order to run suspending functions inside the test, the starter BaseTest class was used (<a href="https://github.com/touchlab/KaMPKit/blob/7f79e90099d278469176588a1067aa877a1e8041/shared/src/commonTest/kotlin/co/touchlab/kampkit/BaseTest.kt?ref=akjaw.com">expect</a> <a href="https://github.com/touchlab/KaMPKit/blob/7f79e90099d278469176588a1067aa877a1e8041/shared/src/androidTest/kotlin/co/touchlab/kampkit/BaseTest.kt?ref=akjaw.com">android</a> <a href="https://github.com/touchlab/KaMPKit/blob/7f79e90099d278469176588a1067aa877a1e8041/shared/src/iosTest/kotlin/co/touchlab/kampkit/BaseTest.kt?ref=akjaw.com">ios</a>) and flows were tested using <a href="https://github.com/cashapp/turbine?ref=akjaw.com">Turbine</a>.</p><h4 id="expect-actual-using-standard-objective-c-frameworks-in-kotlin-native">Expect Actual - Using standard Objective-C frameworks in Kotlin / Native</h4><p>We needed to create a class which uses some cryptographic algorithms, KMP doesn't have that great support for it yet, so we opted for implementing them separately in Kotlin / JVM and Kotlin / Native.</p><p>We wrote some tests in commonTest which used a different implementation depending on which platform is running the tests. The JVM implementation was completed without issues, however the Native one was not completed.  </p><p>Kotlin / Native has access to the CoreCrypto framework / library, but it makes heavy use of custom types which made it difficult to use in Kotlin, which is why we abandoned the idea. </p><p>Besides CoreCrypto there are a lot more standard frameworks and maybe for simpler problems they can be utilized to create working implementations in Kotlin / Native.</p><p>The cryptographic algorithms were implemented in Swift and injected to the KMP module (explained later).</p><h2 id="android">Android</h2><p>We didn't find any issues when using Kotlin Multiplatform, so this section is just a placeholder.</p><h2 id="ios">iOS</h2><h4 id="consuming-coroutines-and-flows">Consuming coroutines and flows</h4><p>When using the wrappers described in the previous section, consuming coroutines and flows from Swift is not so bad. The biggest issues are generics which need to be casted (e.g. NSArray to [String]).</p><p>We also experimented with creating an additional wrapper for coroutines in Swift. The wrapper uses the Result Enum which makes the Swift integration even easier.</p><h4 id="reading-writing-and-debugging-kotlin-code">Reading, Writing and Debugging Kotlin Code</h4><p>Reading and debugging Kotlin from Xcode is possible thanks to the Kotlin XCode plugin from <a href="https://touchlab.co/?ref=akjaw.com">Touchlab</a>:</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/touchlab/xcode-kotlin?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - touchlab/xcode-kotlin: Kotlin Native Xcode Plugin</div><div class="kg-bookmark-description">Kotlin Native Xcode Plugin. Contribute to touchlab/xcode-kotlin development by creating an account on GitHub.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://github.githubassets.com/favicons/favicon.svg" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">touchlab</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://opengraph.githubassets.com/3af46d7218230a96de5c331a69201e4ba085024b76402d0d189380dba05cd5f5/touchlab/xcode-kotlin" alt=""></div></a></figure><p>Writing Kotlin code still requires either IntelliJ or Android Studio.</p><p>Kotlin has a similar syntax to Swift, which doesn't make the language switch so abrupt, but there are some small differences which take some time to get used to. We found that the best way for iOS developers to get more familiar with Kotlin is to write Kotlin code under the supervision of an Android developer (pair/mob programming).</p><h4 id="error-reporting">Error reporting</h4><p>For the POC we used <a href="https://firebase.google.com/docs/crashlytics?ref=akjaw.com">Firebase Crashlytics</a> with the addition of <a href="https://github.com/touchlab/CrashKiOS?ref=akjaw.com">CrashKiOS</a> to make the Kotlin errors show up correctly in the iOS Firebase console. </p><p>Even though we completed every step in the CrashKiOS documentation, the Kotlin errors were still unreadable / missing. The solution for us was to modify the <a href="https://github.com/touchlab/CrashKiOS/tree/ca38c498e8f6b50b410ebfc200c712580bed222f?ref=akjaw.com#upload-dsyms-to-crashlytics">Upload dSYMs to Crashlytics step</a> with the following <a href="https://github.com/touchlab/CrashKiOS/issues/3?ref=akjaw.com#issuecomment-691269524">solution</a>. </p><p>The resulting "upload dSYMs" script was as follows:</p><pre><code>"KaMPKitiOS/Scripts/upload-symbols" -val -gsp "KaMPKitiOS/GoogleService-Info.plist" -p ios -- "${DWARF_DSYM_FOLDER_PATH}"
+"KaMPKitiOS/Scripts/upload-symbols" -gsp "KaMPKitiOS/GoogleService-Info.plist" -p ios -- "${DWARF_DSYM_FOLDER_PATH}" &gt; /dev/null 2&gt;&amp;1 &amp;
+"KaMPKitiOS/Scripts/upload-symbols" -gsp "KaMPKitiOS/GoogleService-Info.plist" -p ios "../build/bin/ios/releaseFramework/shared.framework.dSYM/"
+"KaMPKitiOS/Scripts/upload-symbols" -gsp "KaMPKitiOS/GoogleService-Info.plist" -p ios "../build/bin/ios/debugFramework/shared.framework.dSYM/"</code></pre><p>Thanks to this the dSYMs of the framework are also uploaded which makes the errors in the console readable.</p><h4 id="implementing-kotlin-interfaces-using-swift-implementations-in-kotlin-multiplatform">Implementing Kotlin interfaces / Using Swift implementations in Kotlin Multiplatform</h4><p>Kotlin interfaces are <a href="https://kotlinlang.org/docs/native-objc-interop.html?ref=akjaw.com#mappings">compiled to Objective-C protocols</a>, which makes it possible to implement them in Swift. Special attention is needed when it comes to the types used in the protocol (the easiest way to check the types is to look at the compiled Kotlin code).</p><p>The solution for the cryptographic algorithms was to implement the Kotlin interface in Swift and leverage the native ecosystem for cryptographic frameworks. The biggest issue with this solution is that it makes it impossible to test using Kotlin (at least as far as we know). This resulted in a "duplicated" tests for Kotlin / JVM and Swift</p><p>Introducing this Swift implementation into the Koin dependency graph is done the same way as in the starter. An initKoin method is called with the "to be injected" classes passed in as parameters.</p><h4 id="kotlin-sealed-classes-need-to-be-casted">Kotlin Sealed classes need to be casted</h4><p>Kotlin Sealed classes are compiled into Objective-C protocols, which makes smart-casting with the switch statement impossible. Because of this, sealed class sub-types need to be downcasted.</p><h2 id="conclusion-">Conclusion:</h2><p>Kotlin Multiplatform is still a little bit sharp around the edges, but <a href="https://www.jetbrains.com/?ref=akjaw.com">JetBrains</a> and the Kotlin community is working hard on making it better and more stable. We didn't encounter any major blockers stopping us from continuing the POC, making it a valid candidate for production use.</p><p>I think the biggest benefit of working on Kotlin Multiplatform was that it forced more interactions between the platforms (Android and iOS) which prompted more knowledge sharing between team members. We found that pair programming sessions with and Android and iOS developers are beneficial because they speed up the knowledge sharing for Kotlin Multiplatform. Overall, the cooperation between both platforms increased significantly since we started working on a Kotlin Multiplatform codebase. </p><p>Big thanks to <a href="https://www.linkedin.com/in/mateusz-wagner-825b39155/?ref=akjaw.com">Mateusz Wagner</a> for helping me with the iOS side of the proof of concept.</p><p>If you'd like to dive deeper into the topic check out these articles</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../refactoring-android-to-kotlin-multiplatform/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Refactoring an Android App to Kotlin Multiplatform</div><div class="kg-bookmark-description">Recently I reactivated my old project Timi[https://github.com/AKJAW/Timi-Multiplatform] which I used to learn Compose.This time my focus is on learning the iOS side of Kotlin Multiplatform, I’mhoping that this experience will help me better understand my colleagues on theother platform. Working…</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2022/04/hero-1.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../modularizing-a-kotlin-multiplatform-mobile-project/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Modularizing a Kotlin Multiplatform Mobile Project</div><div class="kg-bookmark-description">This article shows an example modularization strategy for Kotlin Multiplatform Mobile projects and touches on some issues related to modularization and the iOS platform.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2021/10/multiplatform-modularization-hero.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Testing on Kotlin Multiplatform Mobile and a Strategy to Speed Up Development Time</div><div class="kg-bookmark-description">Automated tests are an integral part of developing software, they help catch bugs before they reach the users and save developers time by cutting down manual testing.</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2022/01/kotlin-multiplatform-testing.png" alt=""></div></a></figure><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../kotlin-multiplatform-parameterized-tests-and-grouping/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Kotlin Multiplatform Parameterized Tests and Grouping Using The Standard Kotlin Testing Framework</div><div class="kg-bookmark-description">Keeping Kotlin Multiplatform tests clean while using the standard kotlin.test framework</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="../content/images/size/w256h256/2023/03/favicon-transparent.png" alt=""><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">Aleksander Jaworski</span></div></div><div class="kg-bookmark-thumbnail"><img src="../content/images/2023/01/hero.png" alt=""></div></a></figure><h3 id="update-january-2022-">Update (January 2022)</h3><p>One of our iOS developers <a href="https://dev.to/oleksandr_masliukivskyi_1?ref=akjaw.com">Oleksandr Masliukivskyi</a> published an <a href="https://dev.to/oleksandr_masliukivskyi_1/development-of-a-multiplatform-project-from-ios-engineers-perspective-gnh?ref=akjaw.com">article</a> about his experience on working with Kotlin Multiplatform, check it out if you're interested.</p>
+                    </div>
+
+                    <div class="post-footer">
+
+                        
+
+                        
+                            
+
+                                
+
+                        <h3 class="h4 about-author-section-title">Written by</h3>
+<div class="about-author flex">
+    <div class="avatar-wrap">
+        <a href="../author/aleksander/" title="Aleksander Jaworski"><img class="avatar" src="../content/images/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski"></a>
+    </div>
+    <div class="author-info">
+        <h3 class="name h4"><a href="../author/aleksander/">Aleksander Jaworski</a></h3>
+        <div class="bio">
+            Kotlin Multiplatform enthusiast, working with it since 2020. First with Kotlin / JS, now fully mobile with Kotlin / Native
+        </div>
+    </div>
+</div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <div class="prev-nex-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="post prev-post">
+                    <a href="../kotlin-multiplatform-for-android-and-the-web-part-1/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/2021/08/thesis-multiplatform-part-1.png 300w, ../content/images/size/w600/2021/08/thesis-multiplatform-part-1.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/2021/08/thesis-multiplatform-part-1.png" alt="Kotlin Multiplatform For Android and the Web - Part 1 Introduction and the Server">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Newer article</div>
+                            <h4 class="title">Kotlin Multiplatform For Android and the Web - Part 1 Introduction and the Server</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2021-08-16">Aug 16,                                    2021</time>
+                                <span class="read-time">8 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="post next-post">
+                    <a href="../kotlin-coroutine-flow-stopwatch-part2/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/size/w300/2021/06/hero.png 300w,
+                                   ../content/images/size/w600/2021/06/hero.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/size/w1200/2021/06/hero.png" alt="Implementing a Stopwatch with Kotlin Coroutines and Flow Part 2 - Multiple Stopwatches with Unit and Compose UI Tests">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Older article</div>
+                            <h4 class="title">Implementing a Stopwatch with Kotlin Coroutines and Flow Part 2 - Multiple Stopwatches with Unit and Compose UI Tests</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2021-06-16">Jun 16,                                    2021</time>
+                                <span class="read-time">7 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    <div class="related-posts-wrap">
+    <div class="container">
+        <h3 class="section-title h5 text-center">You might also like</h3>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../github-actions-reducing-duplication-boilerplate/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/09/github-actions-reducing-duplication.png 300w,
+                               ../content/images/size/w600/2023/09/github-actions-reducing-duplication.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/09/github-actions-reducing-duplication.png" alt="GitHub Actions Reducing Duplication / Boilerplate">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../github-actions-reducing-duplication-boilerplate/">GitHub Actions Reducing Duplication / Boilerplate</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-09-09">Sep 09, 2023</time>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-github-actions-ci-verification-labels/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/09/kmp-github-actions.png 300w,
+                               ../content/images/size/w600/2023/09/kmp-github-actions.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/09/kmp-github-actions.png" alt="Kotlin Multiplatform GitHub Actions CI Verification using Labels">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-github-actions-ci-verification-labels/">Kotlin Multiplatform GitHub Actions CI Verification using Labels</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-09-02">Sep 02, 2023</time>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../async-await-coroutines-in-swift-using-kmp-nativecoroutines/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/07/kmp-native-coroutines.png 300w,
+                               ../content/images/size/w600/2023/07/kmp-native-coroutines.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/07/kmp-native-coroutines.png" alt="Async / Await Coroutines in Swift from Kotlin Multiplatform using KMP-NativeCoroutines">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../async-await-coroutines-in-swift-using-kmp-nativecoroutines/">Async / Await Coroutines in Swift from Kotlin Multiplatform using KMP-NativeCoroutines</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-08-02">Aug 02, 2023</time>
+                        <span class="read-time">11 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png 300w,
+                               ../content/images/size/w600/2023/05/multiplatform-platform-implementation-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png" alt="Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/">Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-05-11">May 11, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+		
+        <footer class="site-footer">
+    <div class="container">
+        <div class="footer-top">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="footer-widget widget-about">
+                        <div class="widget-content">
+                            <div class="footer-logo-wrap">
+                                <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+                            </div>
+                            <div class="site-description">
+                                A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski
+                            </div>
+                            <div class="social-links-wrap flex">
+    <div class="social-links flex">
+        <a href="https://twitter.com/akjaw1" aria-label="twitter link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
+        <a href="https://www.linkedin.com/in/akjaw/" aria-label="instagram link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg></a>
+        <a href="https://github.com/AKJAW" aria-label="github link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+    </div>
+</div>                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="widget secondary-nav flex">
+                        
+    <div class="nav-col">
+        <h3 class="title h6">Content</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="../android-next-level/">Android Next Level</a></li>
+                <li class="nav-link"><a href="../tag/multiplatform/">Kotlin Multiplatform</a></li>
+                <li class="nav-link"><a href="../tag/testing/">Testing</a></li>
+                <li class="nav-link"><a href="../tag/android/">Android</a></li>
+                </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">About</h3>
+        <nav>
+            <ul class="no-style-list">
+                <li class="nav-link"><a href="../about-me/">About me</a></li>
+                <li class="nav-link"><a href="/contact-me/">Contact Me</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">Social</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="https://github.com/AKJAW">GitHub</a></li>
+                <li class="nav-link"><a href="https://www.linkedin.com/in/akjaw/">LinkedIn</a></li>
+                <li class="nav-link"><a href="https://twitter.com/akjaw1">Twitter</a></li>
+                <li class="nav-link"><a href="https://iryzyko.pl/">iRyzyko</a></li>
+            </ul>
+        </nav>
+    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom flex justify-space-between">
+            <div class="copyright">
+    &copy; 2026 <a href="../">AKJAW</a> - All right Reserved. Published with <a href="https://ghost.org?via=biswajit48">Ghost</a>
+</div>        </div>
+    </div>
+</footer>		</div>
+		<div class="search-popup js-search-popup">
+    <div class="search-popup-bg"></div>
+	<a href="javascript:;" class="close-button" id="search-close" aria-label="Close search">
+		<svg><use xlink:href="#i-close"/></svg>
+	</a>
+	<div class="popup-inner">
+        <div class="inner-container">
+            <form class="search-form" id="search-form">
+                <div class="search-form-box flex">
+                    <input type="text" class="search-input" placeholder="Type to search" id="search-input" aria-label="Type to search" role="searchbox" autocomplete="off">
+                </div>
+            </form>
+            <div class="search-close-note">Press ESC to close.</div>
+            <div class="search-result" id="search-results"></div>
+            <div class="suggested-tags tag-wrap" id="suggested-tags">
+                <h2 class="h6">Browse posts by popular tags</h2>
+                <div class="tag-list">
+                    <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                    <a href="../tag/multiplatform/"  style="--c-theme:#7b4fff;">Multiplatform</a>
+                    <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                    <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                    <a href="../tag/ios/" >iOS</a>
+                    <a href="../tag/github-actions/" >GitHub Actions</a>
+                    <a href="../tag/coroutines/" >Coroutines</a>
+                    <a href="../tag/ci-cd/" >CI/CD</a>
+                    <a href="../tag/ktor/" >Ktor</a>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>		
+
+
+
+
+
+
+
+
+
+<div class="notification notification-checkout">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your account is fully activated, you now have access to all content.
+</div>
+
+<div class="notification error notification-checkout-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Stripe checkout failed.
+</div>
+
+<div class="notification notification-billing-update">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your billing info is updated.
+</div>
+
+<div class="notification error notification-billing-update-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Billing info update failed.
+</div>		<script>
+            var nextPage = '';
+            var totalPages = '';
+			var TweetQuoteText ='<svg><use xlink:href="#i-twitter"/></svg><span>Tweet this</span>';
+        </script>
+		
+		<script src="../assets/js/app.bundle.min.js"></script>
+        <script>
+$(document).ready(function() {
+    $('a').each(function() {
+       var a = new RegExp('/' + window.location.host + '/');
+       if(!a.test(this.href)) {
+           $(this).attr("target","_blank")
+       }
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-zc7WDnCM3aom2EziyDIRAtQg1mVXLdILE09Bo+aE1xk0AM2c2cVLfSW9NrxE5tKTX44WBY0Z2HClZ05ur9vB6A==" crossorigin="anonymous"></script>
+	</body>
+</html>

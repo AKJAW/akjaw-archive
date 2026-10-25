@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Using Ktor Client MockEngine for Integration and UI Tests</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">		<link rel="preconnect" href="../">
+        <link href="../assets/css/screen.min.css" rel="stylesheet">
+		<script>
+    if(typeof(Storage) !== 'undefined') {
+        let themeMode = document.documentElement.getAttribute('data-theme');
+        if (themeMode !== null && themeMode === 'system') {
+            setSysPrefColor();
+        }
+        const theme = localStorage.getItem('selected-theme');
+        if (theme == 'light') {
+            setColorScheme('light');
+        }
+        else if (theme == 'dark') {
+            setColorScheme('dark');
+        }
+    }
+    function setSysPrefColor() {
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+            setColorScheme('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+            if (e.matches) {
+                setColorScheme('dark');
+            } else {
+                setColorScheme('light');
+            }
+        });
+    }
+    function setColorScheme(scheme) {
+        if (scheme=='dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+</script>		<meta name="description" content="MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.">
+    <link rel="icon" href="../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/using-ktor-client-mock-engine-for-integration-and-ui-tests/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="amp/">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Using Ktor Client MockEngine for Integration and UI Tests">
+    <meta property="og:description" content="MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.">
+    <meta property="og:url" content="https://akjaw.com/using-ktor-client-mock-engine-for-integration-and-ui-tests/">
+    <meta property="og:image" content="https://akjaw.com/content/images/size/w1200/2021/12/ktor-mock-tests-1.png">
+    <meta property="article:published_time" content="2021-12-10T19:09:18.000Z">
+    <meta property="article:modified_time" content="2023-04-12T07:56:25.000Z">
+    <meta property="article:tag" content="Testing">
+    <meta property="article:tag" content="Ktor">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Kotlin">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Using Ktor Client MockEngine for Integration and UI Tests">
+    <meta name="twitter:description" content="MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.">
+    <meta name="twitter:url" content="https://akjaw.com/using-ktor-client-mock-engine-for-integration-and-ui-tests/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/size/w1200/2021/12/ktor-mock-tests-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Testing, Ktor, Android, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Using Ktor Client MockEngine for Integration and UI Tests",
+    "url": "https://akjaw.com/using-ktor-client-mock-engine-for-integration-and-ui-tests/",
+    "datePublished": "2021-12-10T19:09:18.000Z",
+    "dateModified": "2023-04-12T07:56:25.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/size/w1200/2021/12/ktor-mock-tests-1.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "Testing, Ktor, Android, Kotlin",
+    "description": "MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.",
+    "mainEntityOfPage": "https://akjaw.com/using-ktor-client-mock-engine-for-integration-and-ui-tests/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer src="../public/cards.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../public/cards.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    .post-content > * {
+        margin-bottom: 3rem;
+    }
+    .post-content p + ul {
+        margin-top: -2rem;
+    }
+    .post-content p + .kg-code-card, .post-content p + pre[class*=language-] {
+        margin-top: -1rem;
+    }
+	#hyvor-talk-view .reactions-title {
+        color: #cac7c7;
+     }
+    code[class*=language-], pre[class*=language-] {
+        font-size: 16px;   
+    }
+    .share-wrap {
+        margin-bottom: 0rem;
+        margin-top: 2rem;
+    }
+    .newsletter-section input {
+        border-radius: 32px !important;
+        background: var(--body-bg) !important;
+        border: 1px solid var(--c-border) !important;
+        color: var(--c-text-main) !important;
+        font-weight: 500 !important;
+        padding: 0 2rem !important;
+        font-size: 1.235rem !important;
+    }
+    .newsletter-section input::placeholder {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section #mlb2-4433281.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section #mlb2-4433284.ml-form-embedContainer .ml-block-form button[type=submit].primary {
+        height: 56px !important;
+		border-radius: 32px !important;
+        background: var(--c-theme) !important;
+        color: var(--c-button-text) !important;
+        border-color: transparent !important;
+    }
+    .newsletter-section .ml-form-embedWrapper {
+        border-radius: 24px !important;
+		background-color: transparent !important;
+        border: 3px solid var(--c-theme) !important;
+    }
+    .newsletter-section .ml-form-embedWrapper p, .newsletter-section .ml-form-embedWrapper h4  {
+        color: var(--c-text-main) !important;
+    }
+    .newsletter-section .ml-field-email input {
+        height: 56px;
+    }
+    .ml-field-email input {
+        height: inherit;
+    }
+    .post-sneak-peek {
+        position: relative;
+    }
+    .post-sneak-peek.fading:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 50%;
+        background: linear-gradient(transparent, var(--c-body-bg) 90%);
+    }
+</style> 
+
+<script>
+	var apiKey = "a36b1ce3f8a442ba78f296c798";
+</script><style>:root {--ghost-accent-color: #526e8b;}</style>
+	</head>
+	<body class="post-template tag-testing tag-ktor tag-android tag-kotlin" data-nav="sticky-hide" data-search="Third party search">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="global-icons" style="display:none">
+    <symbol id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.083 17.196l4.526 4.528A1.332 1.332 0 0122.667 24a1.33 1.33 0 01-.943-.39l-4.528-4.527a10.602 10.602 0 01-6.53 2.25C4.787 21.333 0 16.548 0 10.667 0 4.785 4.785 0 10.667 0c5.881 0 10.666 4.785 10.666 10.667 0 2.461-.846 4.724-2.25 6.529zm-8.416-14.53c-4.412 0-8 3.589-8 8 0 4.413 3.588 8 8 8s8-3.587 8-8c0-4.411-3.588-8-8-8z"/></symbol>
+    <symbol id="i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.036 7.976a.75.75 0 00-1.06 1.06L10.939 12l-2.963 2.963a.75.75 0 101.06 1.06L12 13.06l2.963 2.964a.75.75 0 001.061-1.06L13.061 12l2.963-2.964a.75.75 0 10-1.06-1.06L12 10.939 9.036 7.976z"></path><path fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z"></path></symbol>
+    <symbol id="i-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="person"><rect opacity="0"/><path d="M12 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/><path d="M18 21a1 1 0 0 0 1-1 7 7 0 0 0-14 0 1 1 0 0 0 1 1z"/></g></g></symbol>
+    <symbol id="i-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.228 23.999l.114.001a12.31 12.31 0 008.762-3.624 12.269 12.269 0 002.803-4.315 1.2 1.2 0 00-1.531-1.557c-3.678 1.339-7.836.426-10.593-2.326a10.078 10.078 0 01-2.33-10.564A1.2 1.2 0 007.899.08a12.271 12.271 0 00-4.792 3.292c-4.24 4.722-4.103 12.278.31 16.843A12.311 12.311 0 0012.227 24zM4.892 4.975a9.882 9.882 0 011.65-1.474c-.475 3.772.797 7.633 3.544 10.376 2.75 2.743 6.62 4.008 10.394 3.538-.32.448-.678.87-1.071 1.262A9.932 9.932 0 0112.34 21.6l-.092-.001a9.928 9.928 0 01-7.109-3.053C1.585 14.868 1.473 8.78 4.892 4.975z"/></symbol>
+    <symbol id="i-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8 1.2v2.4a1.2 1.2 0 102.4 0V1.2a1.2 1.2 0 10-2.4 0zM18.876 7.028a1.195 1.195 0 01-1.697-.03 1.2 1.2 0 01.029-1.696l1.727-1.668a1.202 1.202 0 011.668 1.728l-1.727 1.666zM12 16.8c2.647 0 4.8-2.153 4.8-4.8S14.647 7.2 12 7.2A4.805 4.805 0 007.2 12c0 2.647 2.153 4.8 4.8 4.8zM5.124 16.972l-1.727 1.666a1.2 1.2 0 001.668 1.728l1.727-1.668a1.2 1.2 0 00-1.668-1.726zM17.18 17.002c.46-.477 1.22-.49 1.696-.03l1.727 1.666a1.2 1.2 0 01-1.668 1.728l-1.727-1.668a1.2 1.2 0 01-.029-1.696zM12 19.2a1.2 1.2 0 00-1.2 1.2v2.4a1.2 1.2 0 102.4 0v-2.4a1.2 1.2 0 00-1.2-1.2zM5.065 3.634a1.2 1.2 0 00-1.668 1.728l1.727 1.666a1.195 1.195 0 001.697-.03 1.2 1.2 0 00-.029-1.696L5.065 3.634zM3.6 10.8a1.2 1.2 0 110 2.4H1.2a1.2 1.2 0 110-2.4h2.4zM22.8 10.8h-2.4a1.2 1.2 0 100 2.4h2.4a1.2 1.2 0 100-2.4z"/></symbol>
+    <symbol id="i-twitter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></symbol>
+    <symbol id="i-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></symbol>
+</svg>		<div class="site-wrap">
+		<header class="site-header has-theme-icon">
+    <div class="header-inner flex justify-space-between">
+        <div class="header-logo flex">
+            <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+        </div>
+
+        <input id="mobile-menu-toggle" class="mobile-menu-checkbox" type="checkbox">
+        <label for="mobile-menu-toggle" class="mobile-menu-icon" aria-label="menu toggle button">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="sr-only">Menu toggle button</span>
+        </label>
+
+            <nav class="nav-wrap flex" role="navigation" aria-label="Main navigation">
+        <ul class="nav-left no-style-list" role="menu">
+            <li class="nav-item" role="menuitem">
+                <a href="../talks/" class="nav-link">Talks</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/multiplatform/" class="nav-link">Kotlin Multiplatform</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../tag/testing/" class="nav-link">Testing</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../about-me/" class="nav-link">About me</a>
+            </li>
+            <li class="nav-item" role="menuitem">
+                <a href="../iryzyko/" class="nav-link">iRyzyko</a>
+            </li>
+        </ul>
+
+        
+        <div class="icons-wrap">
+            <button href="javascript:;" class="nav-icon search-icon flex js-search-button">
+                <svg><use xlink:href="#i-search"/></svg>
+            </button>
+                        <a href="javascript:;" class="nav-icon theme-icon flex js-toggle-dark-light" aria-label="Toggle theme">
+                <div class="toggle-mode flex">
+                    <span class="light"><svg><use xlink:href="#i-sun"/></svg></span>
+                    <span class="dark"><svg><use xlink:href="#i-moon"/></svg></span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    </div>
+</header>		
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <article class="single-post post-card">
+                    <header class="post-header">
+                        <div class="tag-wrap">
+                            <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                            <a href="../tag/ktor/" >Ktor</a>
+                            <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                            <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                        </div>
+                        <h1 class="heading-large post-title">
+                            Using Ktor Client MockEngine for Integration and UI Tests
+                        </h1>
+                        <div class="custom-excerpt">
+                            MockEngine replaces real network calls with mocked ones that use pre-defined data and status codes. The engine can be shared between Integration and UI tests.
+                        </div>
+                        <div class="post-meta-wrap flex">
+    <div class="author-avatar-wrap">
+        <a href="../author/aleksander/" class="author-image">
+            <img src="../content/images/size/w150/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski">
+        </a>
+    </div>
+    <div class="meta-info">
+        <div class="author-names">
+            
+            <a href="../author/aleksander/">Aleksander Jaworski</a>
+        </div>
+        <div class="date-time">
+            <time class="post-date" datetime="2021-12-10">Dec 10, 2021</time>
+            <span class="read-time">8 min read</span>
+        </div>
+    </div>
+</div>                    </header>
+                    <div class="featured-image-wrap">
+                        <img class="featured-image" loading="lazy"
+                            srcset="../content/images/size/w300/2021/12/ktor-mock-tests-1.png 300w,
+                               ../content/images/size/w600/2021/12/ktor-mock-tests-1.png 600w,
+                              ../content/images/size/w1200/2021/12/ktor-mock-tests-1.png 1200w,"
+                            sizes="(max-width: 340px) 300px, (max-width: 640px) 600px, 1200px"
+                            src="../content/images/size/w1200/2021/12/ktor-mock-tests-1.png" alt="Using Ktor Client MockEngine for Integration and UI Tests">
+                    </div>
+                    <div class="featured-image-caption text-center"></div>
+                    <div class="post-content">
+                        <p>Recently I started doing more integrations tests which try to use as much real implementation as is possible for a given feature. Also, I stared using Ktor Client for network requests more, and that's when I discovered the <a href="https://ktor.io/docs/http-client-testing.html?ref=akjaw.com">MockEngine</a>. The engine replaces real network calls with pre-defined data and status codes. </p><p>In this article, I'll try to show that adding it to a codebase is pretty straight forward. The project used in this article is a <a href="https://github.com/AKJAW/ktor-mock-tests?ref=akjaw.com">sample Android app</a> which illustrates how to use MockEngine for Integration and UI tests</p><h2 id="the-application">The application</h2><p>Before we can start testing the application, we need to know what our requirements are. The app allows the user to search through <a href="https://github.com/?ref=akjaw.com">GitHub</a> repositories sorted by their star count. The application UI contains:</p><ul><li>A text input for the repository name</li><li>A button which fetches the search results</li><li>The result, which can be either an error message or a list of repositories</li></ul><figure class="kg-card kg-gallery-card kg-width-wide kg-card-hascaption"><div class="kg-gallery-container"><div class="kg-gallery-row"><div class="kg-gallery-image"><img src="../content/images/2021/12/app-with-no-search-results.png" width="500" height="889" loading="lazy" alt></div><div class="kg-gallery-image"><img src="../content/images/2021/12/app-with-search-results.png" width="500" height="889" loading="lazy" alt></div></div></div><figcaption>The error and success screens of the Android app</figcaption></figure><h2 id="mocking-the-responses">Mocking the responses</h2><h3 id="understanding-the-api-were-mocking">Understanding the API we're mocking</h3><p>Now that we know what our functionality is, we need to know what data the <a href="https://docs.github.com/en/rest/reference/search?ref=akjaw.com">GitHub Search API</a> returns, so we can prepare our mocks.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="../content/images/2021/12/postman-github-search-api-results-1.png" class="kg-image" alt loading="lazy" width="1033" height="746" srcset="../content/images/size/w600/2021/12/postman-github-search-api-results-1.png 600w, ../content/images/size/w1000/2021/12/postman-github-search-api-results-1.png 1000w, ../content/images/2021/12/postman-github-search-api-results-1.png 1033w" sizes="(min-width: 720px) 720px"><figcaption>A postman API response for the "tetris" keyword</figcaption></figure><p>Before mocking the responses, we could write an exploratory test where we call the real API and just ensure that Ktor responds with the correct response.</p><pre><code class="language-Kotlin">class GithubSearchApi {
+
+    private val httpClient = HttpClient {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
+        }
+    }
+
+    suspend fun fetchRepositories(): List&lt;RepositorySchema&gt; {
+        val wrapper: ResponseWrapperSchema = httpClient
+            .get("https://api.github.com/search/repositories?q=tetris&amp;sort=stars&amp;order=desc")
+        return wrapper.items
+    }
+}</code></pre><pre><code class="language-Kotlin">class GitHubApiExploratoryTest : KoinTest {
+    
+    @Test
+    fun `Correctly fetches "tetris" repositories`() = runBlocking {
+        val results = GithubSearchApi().fetchRepositories()
+
+        results.first().name shouldBe "react-tetris"
+    }
+}</code></pre><p>Once this test passes, we know that our API assumptions and modeling is correct, then we can start mocking this response.</p><h3 id="preparing-data-for-the-mock-response">Preparing data for the mock response</h3><p>This step just involves copying the actual response to a JSON file or a simple Kotlin string, which we then return in our mocked response</p><pre><code class="language-Kotlin">const val FOR_TETRIS = """
+{
+    "total_count": 46200,
+    "incomplete_results": false,
+    "items": [
+        {
+            "id": 76954504,
+            "node_id": "MDEwOlJlcG9zaXRvcnk3Njk1NDUwNA==",
+            "name": "react-tetris",
+            "full_name": "chvin/react-tetris",
+            "private": false,
+            "owner": {
+                "login": "chvin",
+                "id": 5383506,
+                "node_id": "MDQ6VXNlcjUzODM1MDY=",
+                "avatar_url": "https://avatars.githubusercontent.com/u/5383506?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/chvin",
+                "html_url": "https://github.com/chvin",
+// ...</code></pre><p>In the sample project, I also created mocked responses for invalid user input and for "tet" search input.</p><h3 id="creating-a-simple-mockengine-to-pass-the-exploratory-test">Creating a simple MockEngine to pass the exploratory test</h3><p>The MockEngine "constructor" takes in a lambda which takes in a request (HttpRequestData). Inside the lambda, we can respond to that request.</p><pre><code class="language-Kotlin">class GitHubApiMock {
+
+    val engine = MockEngine { request -&gt;
+        respond(
+            content = MockedApiResponse.FOR_TETRIS,
+            status = HttpStatusCode.OK,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
+    }
+}</code></pre><p></p><p>To use the mocked engine, we need to pass it to the Ktor HttpClient.</p><pre><code class="language-Kotlin">class GithubSearchApi {
+
+    val mockEngine = GitHubApiMock().engine
+
+    private val httpClient = HttpClient(
+        engine = mockEngine
+    ) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
+        }
+    }
+
+    suspend fun fetchRepositories(): List&lt;RepositorySchema&gt; {
+        val wrapper: ResponseWrapperSchema = httpClient
+            .get("https://api.github.com/search/repositories?q=tetris&amp;sort=stars&amp;order=desc")
+        return wrapper.items
+    }
+}</code></pre><p></p><p>The test should remain the same because we want to verify that it behaves the same way as the real GitHub API.</p><pre><code class="language-Kotlin">class GitHubApiExploratoryTest : KoinTest {
+    
+    @Test
+    fun `Correctly fetches "tetris" repositories`() = runBlocking {
+        val results = GithubSearchApi().fetchRepositories()
+
+        results.first().name shouldBe "react-tetris"
+    }
+}</code></pre><h3 id="customizing-our-mockengine">Customizing our MockEngine</h3><p>Having an API that returns only one response is kind of pointless, however, the MockEngine allows us to extend its functionality based on the request that the user sent.</p><pre><code class="language-Kotlin">class GithubSearchApi {
+
+	// ...
+
+    suspend fun fetchRepositories(
+    	searchKeyword: String
+    ): List&lt;RepositorySchema&gt;? {
+        return try {
+            val wrapper: ResponseWrapperSchema = httpClient
+                .get("https://api.github.com/search/repositories?q=$searchKeyword&amp;sort=stars&amp;order=desc")
+            wrapper.items
+        } catch (e: ResponseException) {
+            null
+        }
+    }
+}</code></pre><p>We allow the user to pass in a search keyword, which we will handle in the MockEngine.</p><pre><code class="language-Kotlin">class GitHubApiMock {
+
+    companion object {
+        const val TETRIS_KEYWORD = "tetris"
+        const val TET_KEYWORD = "tet"
+    }
+
+    val engine = MockEngine { request -&gt;
+        handleSearchRequest(request)
+            ?: errorResponse()
+    }
+
+    private fun MockRequestHandleScope.handleSearchRequest(
+    	request: HttpRequestData
+    ): HttpResponseData? {
+    	// 1
+        if (request.url.encodedPath.contains("search/repositories").not()) {
+            return null
+        }
+
+		// 2
+        val searchKeyword = request.url.parameters["q"] ?: ""
+        val responseContent = when (searchKeyword.lowercase()) {
+            "tetris" -&gt; MockedApiResponse.FOR_TETRIS
+            "tet" -&gt; MockedApiResponse.FOR_TET
+            else -&gt; MockedApiResponse.FOR_INVALID
+        }
+
+        return respond(
+            content = responseContent,
+            status = HttpStatusCode.OK,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
+    }
+
+    private fun MockRequestHandleScope.errorResponse(): HttpResponseData {
+        return respond(
+            content = "",
+            status = HttpStatusCode.BadRequest,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
+    }
+}</code></pre><ol><li>If the request is for a different endpoint than the repository search, then we respond with an error.</li><li>Based on the user search keyword, we return a different response</li></ol><p>Sometimes in tests we also want to simulate API errors, so we can handle edge cases gracefully.</p><pre><code class="language-Kotlin">class GitHubApiMock {
+
+    private var isSuccess: Boolean? = null
+        get() = field ?: throw IllegalStateException("Mock has not beet initialized")
+
+    fun givenSuccess() {
+        isSuccess = true
+    }
+
+    fun givenFailure() {
+        isSuccess = false
+    }
+
+    val engine = MockEngine { request -&gt;
+        handleSearchRequest(request)
+            ?: errorResponse()
+    }
+
+    private fun MockRequestHandleScope.handleSearchRequest(
+    	request: HttpRequestData
+    ): HttpResponseData? {
+        // ...
+
+        val statusCode = if (isSuccess == true) {
+            HttpStatusCode.OK
+        } else {
+            HttpStatusCode.InternalServerError
+        }
+
+        return respond(
+            content = responseContent,
+            status = statusCode,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
+    }
+
+    // ...
+}</code></pre><p>The <strong>givenSuccess</strong> and <strong>givenFailures</strong> are called in the tests in order to set up the correct API response.</p><p>The finished GitHubApiMock class used in the sample project is in the <a href="https://github.com/AKJAW/ktor-mock-tests/tree/main/app/src/main/java/com/akjaw/ktor/mock/tests/mock?ref=akjaw.com">GitHub Repository</a>. The mock is placed alongside production code to keep the example simple, in a real project it could be extracted to a test-utils module for example.</p><p>To make the MockEngine more extendable, instead of creating a method for handling each endpoint request, a class with a similar method could be injected through the constructor. </p><p>For even more extendibility, the class could be hidden behind an interface and be injected as a list of those interfaces.</p><pre><code class="language-Kotlin">interface MockHandler {
+
+    fun handleRequest(
+        scope: MockRequestHandleScope,
+        request: HttpRequestData
+    ): HttpResponseData?
+}</code></pre><pre><code class="language-Kotlin">class GitHubApiMock(handlers: List&lt;MockHandler&gt;) {
+
+	// ...
+
+    val engine = MockEngine { request -&gt;
+        handlers.forEach { handler -&gt;
+            val response = handler.handleRequest(this, request)
+            if (response != null) {
+                return@MockEngine response
+            }
+        }
+        return@MockEngine errorResponse()
+    }
+    
+    // ...
+}
+</code></pre><p>This way the MockEngine doesn't know about the handlers implementation details, and the tests could only inject the handlers which they need.</p><h2 id="writing-the-integration-tests">Writing the Integration tests</h2><p>In the sample project, the integration tests entry point is the domain class for the search feature. The domain class has the following contract:</p><pre><code class="language-Kotlin">class SearchManager {
+
+    suspend fun perform(keyword: String): SearchResult
+}
+</code></pre><h3 id="focusing-on-the-successful-and-failure-responses">Focusing on the Successful and Failure responses</h3><p>At first, we don't care about the requirements other than getting the repository search result or an error.</p><pre><code class="language-Kotlin">@Test
+fun `On API success returns the correct first result for keyword 'tetris'`() = runTest {
+    gitHubApiMock.givenSuccess()
+
+    val result = searchManager.perform(GitHubApiMock.TETRIS_KEYWORD)
+    
+    assertSoftly {
+        result.shouldBeInstanceOf&lt;SearchResult.Success&gt;()
+        result.repositories.first() shouldBe RepositoryInfo(
+            id = 76954504,
+            name = "react-tetris",
+            ownerName = "chvin"
+        )
+    }
+}</code></pre><pre><code class="language-Kotlin">@Test
+fun `On API failure returns an error`() = runTest {
+    gitHubApiMock.givenFailure()
+
+    val result = searchManager.perform(GitHubApiMock.TETRIS_KEYWORD)
+
+    result shouldBe SearchResult.ApiError
+}</code></pre><h3 id="validating-user-input">Validating user input</h3><p>Taking into account our business requirement that the search should only happen if the user input length is at least 3 characters long.</p><p>First, we can write an acceptance test for it:</p><pre><code class="language-Kotlin">@Test
+fun `Gives correct result if keyword is invalid`() = runTest {
+    val result = searchManager.perform("te")
+
+    result shouldBe SearchResult.InvalidKeyword
+}</code></pre><p>Now we can implement the validation (of course with a <a href="https://github.com/AKJAW/ktor-mock-tests/blob/main/app/src/test/java/com/akjaw/ktor/mock/tests/domain/SearchKeywordValidatorTest.kt?ref=akjaw.com">corresponding unit test</a>).</p><pre><code class="language-Kotlin">class SearchKeywordValidator {
+
+    fun validate(input: String): Boolean = input.trim().count() &gt;= 3
+}</code></pre><h3 id="ensuring-that-the-api-was-not-called">Ensuring that the API was not called</h3><p>The MockEngine also allows accessing the request and response history. If we wanted to ensure that the API is not called on an invalid input, we could check the request history on the MockEngine.</p><pre><code class="language-Kotlin">@Test
+fun `The API is not called if keyword is invalid`() = runTest {
+    val result = searchManager.perform("te")
+
+    result shouldBe SearchResult.InvalidKeyword
+
+    gitHubApiMock.engine.requestHistory.shouldBeEmpty()
+}</code></pre><h3 id="how-to-set-up-and-maintain-integration-tests-with-the-help-of-dependency-injection-libraries-frameworks">How to set up and maintain Integration tests with the help of dependency injection libraries / frameworks</h3><p>Writing Integration can be cumbersome if there are a lot of classes, to help this there is a concept called <a href="https://martinfowler.com/bliki/ObjectMother.html?ref=akjaw.com">Object Mothers</a>. However, I think that this could be simplified by using a DI library / framework. </p><p>Besides simplifying the Integration test set-up, a similar strategy for dependency injection could be probably used when writing UI tests.</p><p>The framework I used in the example is <a href="https://insert-koin.io/?ref=akjaw.com">Koin</a> which is really easy to use in <a href="https://insert-koin.io/docs/reference/koin-test/testing/?ref=akjaw.com">testing</a>, however I'm sure this is also possible using other solutions like <a href="https://dagger.dev/hilt/testing?ref=akjaw.com">Dagger Hilt</a>. For more details about my Koin set up, please check out the <a href="https://github.com/AKJAW/ktor-mock-tests?ref=akjaw.com">sample project on GitHub</a>.</p><h2 id="using-the-mockengine-in-ui-tests">Using the MockEngine in UI tests</h2><p>An additional benefit of using the Ktor MockEngine is that it can be also used in the Android app. The end user might not appreciate the small amount of results, however the pre-defined responses are a perfect fit for automated UI tests. The tests won't use an internet connection, which should reduce their flakiness, also network edge cases can also be easily mocked up.</p><p>I won't go into details of how the tests look like because they all depend on what testing framework is used. The most important part is that the dependency injection graph needs to be structured in such a way, that the UI tests are able to inject the MockEngine and replace the real HttpClientEngine. This step should also be a lot easier if the Integration tests also make use of such dependency graph.</p><p>The UI tests for the sample app look like this:</p><figure class="kg-card kg-embed-card kg-card-hascaption"><iframe src="https://player.vimeo.com/video/814170824?h=864048373b&amp;app_id=122963" width="272" height="240" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="ktor-mock-test-app-ui"></iframe><figcaption>The automated UI tests for the Android app</figcaption></figure><p>If you're interested in their implementation, the source code is in the <a href="https://github.com/AKJAW/ktor-mock-tests/blob/main/app/src/androidTest/java/com/akjaw/ktor/mock/tests/SearchScreenTest.kt?ref=akjaw.com">repository</a>.</p><h2 id="what-are-the-benefits-of-using-ktor-mockengine">What are the benefits of using Ktor MockEngine</h2><p>For me, the biggest benefit is that the full network layer can be tested because we can make the mock behave just like the real API. We don't need to create additional abstractions in order to create test doubles for the network layer. </p><p>Those test doubles that simulate the network layer also require special maintenance attention. Changes in the production network layer also need to be applied in the test double.</p><p>The MockEngine also nicely ties into the Classic / Chicago Test Driven Development, where the tests try to use as many production dependencies as possible.</p><p>Besides mocking Ktor I've also covered <a href="../kotlin-multiplatform-testing-sqldelight-integration-ios-android/">In-Memory SQLDelight testing</a> or <a href="../using-apollo-kotlin-data-builders-for-testing/">Apollo GraphQL fake networking</a> which might interest you. Additionally, I have an article series about <a href="../5-beginner-testing-mistakes-i-noticed-while-working-with-less-experienced-developers/">what testing mistakes you should avoid</a> if you want to improve your test suite.</p><h2 id="a-kotlin-multiplatform-side-note">A Kotlin Multiplatform side-note</h2><p>I've used the MockEngine with success on a Kotlin Multiplatform Mobile project. However, I haven't got the chance to use it in the iOS UI tests. I don't see why it shouldn't work, but you never know (I'll write an update here when I'll have a chance to try it).</p><p>As far as Kotlin Multiplatform development goes, the MockEngine can really speed up the development cycle because the tests provide fast feedback about the implementation (even on Kotlin / Native).</p><p>Currently, as of writing this article, one of the biggest "issues" with Kotlin Multiplatform is the threading model which does not allow mutations on a background thread. </p><p>Network requests are one of the places that we extensively use the background thread. If we wanted to implement some cache for the response data, we would almost definitely need to mutate something.</p><p>Writing Integration tests, where real dependencies are used, can save a lot of debugging time on the iOS side caused by wrong mutations on the background thread. The MockEngine is a great fit for this, because the tests still use the real Ktor HttpClientEngine, but just with predefined responses.</p>
+                    </div>
+
+                    <div class="post-footer">
+
+                        
+
+                        
+                            
+
+                                
+
+                        <h3 class="h4 about-author-section-title">Written by</h3>
+<div class="about-author flex">
+    <div class="avatar-wrap">
+        <a href="../author/aleksander/" title="Aleksander Jaworski"><img class="avatar" src="../content/images/2023/09/Avatar-2.jpg" loading="lazy" alt="Aleksander Jaworski"></a>
+    </div>
+    <div class="author-info">
+        <h3 class="name h4"><a href="../author/aleksander/">Aleksander Jaworski</a></h3>
+        <div class="bio">
+            Kotlin Multiplatform enthusiast, working with it since 2020. First with Kotlin / JS, now fully mobile with Kotlin / Native
+        </div>
+    </div>
+</div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <div class="prev-nex-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="post prev-post">
+                    <a href="../old/old-testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/2023/04/kotlin-multiplatform-testing-1.png 300w, ../content/images/size/w600/2023/04/kotlin-multiplatform-testing-1.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/2023/04/kotlin-multiplatform-testing-1.png" alt="Testing on Kotlin Multiplatform Mobile and a Strategy to Speed Up Development Time (2022)">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Newer article</div>
+                            <h4 class="title">Testing on Kotlin Multiplatform Mobile and a Strategy to Speed Up Development Time (2022)</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2022-01-21">Jan 21,                                    2022</time>
+                                <span class="read-time">12 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="post next-post">
+                    <a href="../keeping-gradle-dependencies-up-to-date-with-github-actions-and-refreshversions/" class="flex">
+                        <div class="featured-image">
+                            <img loading="lazy"
+                            srcset="../content/images/size/w300/2021/11/github-actions-refreshversions.png 300w,
+                                   ../content/images/size/w600/2021/11/github-actions-refreshversions.png 600w,"
+                            sizes="(max-width: 340px) 300px, (min-width: 341px) and (max-width: 575px) 600px, 300px"
+                            src="../content/images/size/w1200/2021/11/github-actions-refreshversions.png" alt="Keeping Gradle Dependencies up to Date with GitHub Actions and RefreshVersions">
+                        </div>
+                        <div class="content-wrap">
+                            <div class="nav-text">Older article</div>
+                            <h4 class="title">Keeping Gradle Dependencies up to Date with GitHub Actions and RefreshVersions</h4>
+                            <div class="post-meta">
+                                <time class="post-date" datetime=" 2021-11-15">Nov 15,                                    2021</time>
+                                <span class="read-time">4 min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    <div class="related-posts-wrap">
+    <div class="container">
+        <h3 class="section-title h5 text-center">You might also like</h3>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../using-mutation-testing-for-good-test-coverage/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/11/mutation-testing-3.png 300w,
+                               ../content/images/size/w600/2023/11/mutation-testing-3.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/11/mutation-testing-3.png" alt="How I use Mutation Testing to Drive Good Test Case Coverage">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../using-mutation-testing-for-good-test-coverage/">How I use Mutation Testing to Drive Good Test Case Coverage</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-12-05">Dec 05, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png 300w,
+                               ../content/images/size/w600/2023/05/multiplatform-platform-implementation-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/05/multiplatform-platform-implementation-1.png" alt="Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../kotlin-multiplatform-writing-platform-specific-implementations-with-contract-testing/">Kotlin Multiplatform: Writing Platform Specific Implementations with Contract Testing</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-05-11">May 11, 2023</time>
+                        <span class="read-time">6 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/04/kotlin-multiplatform-testing-updated-4.png 300w,
+                               ../content/images/size/w600/2023/04/kotlin-multiplatform-testing-updated-4.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/04/kotlin-multiplatform-testing-updated-4.png" alt="Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../testing-on-kotlin-multiplatform-and-strategy-to-speed-up-development/">Testing on Kotlin Multiplatform and a Strategy to Speed Up Development Time (2023 Update)</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-04-15">Apr 15, 2023</time>
+                        <span class="read-time">14 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <article class="post-card">
+                <a href="../testing-mistakes-part-4/" class="post-img-wrap">
+                    <img class="post-img" loading="lazy"
+                        srcset="../content/images/size/w300/2023/04/hero-part4-1.png 300w,
+                               ../content/images/size/w600/2023/04/hero-part4-1.png 600w"
+                        sizes="(max-width: 575px) 300px,(min-width: 576px) and (max-width:680px) 600px, (min-width:681px) and (max-width: 991px) 600px, 300px"
+                        src="../content/images/size/w300/2023/04/hero-part4-1.png" alt="21 Testing Mistakes - Part 4">
+                </a>
+                <div class="post-info-wrap">
+                    <h4 class=" post-title"><a href="../testing-mistakes-part-4/">21 Testing Mistakes - Part 4</a></h4>
+                    <div class="post-meta">
+                        <time class="post-date" datetime="2023-04-07">Apr 07, 2023</time>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+		
+        <footer class="site-footer">
+    <div class="container">
+        <div class="footer-top">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="footer-widget widget-about">
+                        <div class="widget-content">
+                            <div class="footer-logo-wrap">
+                                <a href="../" class="logo-img theme-light-logo">
+    <img src="../content/images/2023/03/logo-black-transparent-1.png" alt="AKJAW">
+</a>
+<a href="../" class="logo-img theme-dark-logo">
+    <img src="../content/images/2023/03/logo-whte-transparent.png" alt="AKJAW">
+</a>
+                            </div>
+                            <div class="site-description">
+                                A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski
+                            </div>
+                            <div class="social-links-wrap flex">
+    <div class="social-links flex">
+        <a href="https://twitter.com/akjaw1" aria-label="twitter link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
+        <a href="https://www.linkedin.com/in/akjaw/" aria-label="instagram link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg></a>
+        <a href="https://github.com/AKJAW" aria-label="github link" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+    </div>
+</div>                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="widget secondary-nav flex">
+                        
+    <div class="nav-col">
+        <h3 class="title h6">Content</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="../android-next-level/">Android Next Level</a></li>
+                <li class="nav-link"><a href="../tag/multiplatform/">Kotlin Multiplatform</a></li>
+                <li class="nav-link"><a href="../tag/testing/">Testing</a></li>
+                <li class="nav-link"><a href="../tag/android/">Android</a></li>
+                </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">About</h3>
+        <nav>
+            <ul class="no-style-list">
+                <li class="nav-link"><a href="../about-me/">About me</a></li>
+                <li class="nav-link"><a href="/contact-me/">Contact Me</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="nav-col">
+        <h3 class="title h6">Social</h3>
+        <nav>
+        <ul class="no-style-list">
+                <li class="nav-link"><a href="https://github.com/AKJAW">GitHub</a></li>
+                <li class="nav-link"><a href="https://www.linkedin.com/in/akjaw/">LinkedIn</a></li>
+                <li class="nav-link"><a href="https://twitter.com/akjaw1">Twitter</a></li>
+                <li class="nav-link"><a href="https://iryzyko.pl/">iRyzyko</a></li>
+            </ul>
+        </nav>
+    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom flex justify-space-between">
+            <div class="copyright">
+    &copy; 2026 <a href="../">AKJAW</a> - All right Reserved. Published with <a href="https://ghost.org?via=biswajit48">Ghost</a>
+</div>        </div>
+    </div>
+</footer>		</div>
+		<div class="search-popup js-search-popup">
+    <div class="search-popup-bg"></div>
+	<a href="javascript:;" class="close-button" id="search-close" aria-label="Close search">
+		<svg><use xlink:href="#i-close"/></svg>
+	</a>
+	<div class="popup-inner">
+        <div class="inner-container">
+            <form class="search-form" id="search-form">
+                <div class="search-form-box flex">
+                    <input type="text" class="search-input" placeholder="Type to search" id="search-input" aria-label="Type to search" role="searchbox" autocomplete="off">
+                </div>
+            </form>
+            <div class="search-close-note">Press ESC to close.</div>
+            <div class="search-result" id="search-results"></div>
+            <div class="suggested-tags tag-wrap" id="suggested-tags">
+                <h2 class="h6">Browse posts by popular tags</h2>
+                <div class="tag-list">
+                    <a href="../tag/kotlin/"  style="--c-theme:#e38fff;">Kotlin</a>
+                    <a href="../tag/multiplatform/"  style="--c-theme:#7b4fff;">Multiplatform</a>
+                    <a href="../tag/android/"  style="--c-theme:#67b54b;">Android</a>
+                    <a href="../tag/testing/"  style="--c-theme:#871807;">Testing</a>
+                    <a href="../tag/ios/" >iOS</a>
+                    <a href="../tag/github-actions/" >GitHub Actions</a>
+                    <a href="../tag/coroutines/" >Coroutines</a>
+                    <a href="../tag/ci-cd/" >CI/CD</a>
+                    <a href="../tag/ktor/" >Ktor</a>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>		
+
+
+
+
+
+
+
+
+
+<div class="notification notification-checkout">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your account is fully activated, you now have access to all content.
+</div>
+
+<div class="notification error notification-checkout-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Stripe checkout failed.
+</div>
+
+<div class="notification notification-billing-update">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Success! Your billing info is updated.
+</div>
+
+<div class="notification error notification-billing-update-cancel">
+    <a class="notification-close" href="javascript:;" aria-label="close notification"><span class="close-icon"><svg><use xlink:href="#i-close"/></svg></span></a>
+    Error! Billing info update failed.
+</div>		<script>
+            var nextPage = '';
+            var totalPages = '';
+			var TweetQuoteText ='<svg><use xlink:href="#i-twitter"/></svg><span>Tweet this</span>';
+        </script>
+		
+		<script src="../assets/js/app.bundle.min.js"></script>
+        <script>
+$(document).ready(function() {
+    $('a').each(function() {
+       var a = new RegExp('/' + window.location.host + '/');
+       if(!a.test(this.href)) {
+           $(this).attr("target","_blank")
+       }
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-zc7WDnCM3aom2EziyDIRAtQg1mVXLdILE09Bo+aE1xk0AM2c2cVLfSW9NrxE5tKTX44WBY0Z2HClZ05ur9vB6A==" crossorigin="anonymous"></script>
+	</body>
+</html>

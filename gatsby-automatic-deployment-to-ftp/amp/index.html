@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>Deploying a Gatsby website to an FTP server with CircleCi</title>
+
+    <meta name="description" content="How I implemented a CI/CD workflow to deploy a Gatsby website hosted on a server with FTP access">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/gatsby-automatic-deployment-to-ftp/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Deploying a Gatsby website to an FTP server with CircleCi">
+    <meta property="og:description" content="How I implemented a CI/CD workflow to deploy a Gatsby website hosted on a server with FTP access">
+    <meta property="og:url" content="https://akjaw.com/gatsby-automatic-deployment-to-ftp/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2021/03/gatsby-ftp-circleci.png">
+    <meta property="article:published_time" content="2020-04-19T18:52:00.000Z">
+    <meta property="article:modified_time" content="2021-03-11T18:21:35.000Z">
+    <meta property="article:tag" content="Gatsby">
+    <meta property="article:tag" content="Node.JS">
+    <meta property="article:tag" content="CircleCi">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Deploying a Gatsby website to an FTP server with CircleCi">
+    <meta name="twitter:description" content="How I implemented a CI/CD workflow to deploy a Gatsby website hosted on a server with FTP access">
+    <meta name="twitter:url" content="https://akjaw.com/gatsby-automatic-deployment-to-ftp/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2021/03/gatsby-ftp-circleci.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Gatsby, Node.JS, CircleCi">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="440">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "Deploying a Gatsby website to an FTP server with CircleCi",
+    "url": "https://akjaw.com/gatsby-automatic-deployment-to-ftp/",
+    "datePublished": "2020-04-19T18:52:00.000Z",
+    "dateModified": "2021-03-11T18:21:35.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2021/03/gatsby-ftp-circleci.png",
+        "width": 1200,
+        "height": 440
+    },
+    "keywords": "Gatsby, Node.JS, CircleCi",
+    "description": "How I implemented a CI/CD workflow to deploy a Gatsby website hosted on a server with FTP access",
+    "mainEntityOfPage": "https://akjaw.com/gatsby-automatic-deployment-to-ftp/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">Deploying a Gatsby website to an FTP server with CircleCi</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2020-04-19">19 Apr 2020</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2021/03/gatsby-ftp-circleci.png" width="600" height="340" layout="responsive" 
+                alt="Deploying a Gatsby website to an FTP server with CircleCi"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <h2 id="preface">Preface</h2><p>The last version of my website was made with <a href="https://www.gatsbyjs.org/?ref=akjaw.com" rel="noopener noreferrer">Gatsby</a>. Deploying a Gatsby website is as easy as running one command (<strong>gatsby build</strong>) and placing the created folder on a server.</p><p>My current hosting service gives me access to my server through FTP and SSH. Unfortunately I do not have access to the sudo command which means that I can’t Install anything from the command line. This limitation forces me to upload a new version of my site with the use of FTP. By trail and error I learned to always save the previous version of my site if I ever needed a rollback.</p><p>As you can guess, my site deployment strategy requires a lot of manual steps:</p><pre>
+1. Build the site with **gatsby build**
+2. Connect to the FTP server
+3. Upload the new build
+4. Rename the current production for backup
+5. Make the uploaded build the new production
+</pre><p>It might not seem like a lot, but it will add up fast. I thought about automating this process, the official <a href="https://www.gatsbyjs.org/docs/deploying-and-hosting/?ref=akjaw.com" rel="noopener noreferrer">Gatsby documentation </a>lists a lot of option, but none suited my needs, because I wanted to keep my current hosting service without moving my domain.</p><p>I tried out <a href="https://www.netlify.com/?ref=akjaw.com" rel="noopener noreferrer">Netlify </a>with the idea of doing a <a href="https://www.nginx.com/resources/glossary/reverse-proxy-server/?ref=akjaw.com" rel="noopener noreferrer">reverse proxy</a>, but I soon realized that I lack the experience needed for this, and found out that Netlify doesn’t really <a href="https://community.netlify.com/t/trying-to-set-up-a-nginx-reverse-proxy-fails/4542/2?ref=akjaw.com" rel="noopener noreferrer">support </a>this type of proxy.</p><p>After some more digging around I stumbled upon the idea of using a CI/CD pipeline for automatic build deployment.</p><h2 id="circleci">CircleCi</h2><p><a href="https://circleci.com/?ref=akjaw.com" rel="noopener noreferrer">CircleCi </a> is a continuous integration and delivery service which can be hosted in the cloud for free. I didn't want to host my own CI/CD because of the maintenance and additional manual work.</p><p>After connecting my repository to CircleCI and providing the starter config, I also needed to set 3 environment variables to my project. The <strong>FTP address</strong>, <strong>username</strong> and <strong>password</strong>. These variables are encrypted and only visible from inside the CircleCi workflow.</p><p>CircleCi listens to repository changes and runs the workflow based on the config file placed in the repository. This means that to change the config there has to be a new commit that to triggers the workflow start. Because of this, testing it a little cumbersome, to avoid unnecessary commits I had to resort to a lot of forced commits.</p><p>Here’s the latest and I hope the final version of the config:</p><pre><code class="language-yaml">version: 2.1
+orbs:
+  node: circleci/node@2.0.2
+
+jobs:
+  build-deploy:
+    executor:
+      name: node/default
+      tag: '12.16.1'
+    steps:
+      - checkout
+      - node/install-packages
+      - run: npm run build
+      - run:
+          name: Deploying
+          command: node ./ftp-deploy.js $FTP_ADDRESS $FTP_USER $FTP_PASSWORD
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build-deploy:
+          filters:
+            branches:
+              only: master</code></pre><p>Without delving into a lot of details, the <strong>build-deploy</strong> job is only called on new commits in the master branch which means deployment only happens on that branch. The <strong>executor</strong> <strong>checkout</strong>s to the master branch and installs all required node packages with <strong>node/install-packages</strong>. After that it builds the project and runs the <strong>ftp-deploy.js</strong> with the 3 environment variables passed in as command line arguments. This allows the script to connect to the FTP server without hard-coding any credentials.</p><p>This is my first time using such a service, so my solution is probably far from perfect, but as of now I’m happy with it.</p><h2 id="node-js">Node.js</h2><p>The <strong>ftp-deploy.js</strong> is the star of the show, it is responsible for all the logic related to the deployment. The script is a little complicated, but I will try to split it into digestible slices. If you want to see the whole script <a href="./#the-whole-script-or-a-gist-">click here</a></p><p>Starting from the top of the source file, here are the dependencies and constants:</p><pre><code class="language-javascript">const FtpDeploy = require("ftp-deploy")
+const ftp = require("basic-ftp")
+const basicFtpClient = new ftp.Client()
+const https = require('https');
+
+const LOCAL_BUILD_DIRECTORY = "public"
+const DEPLOY_DIRECTORY_NAME = "temp"
+const PRODUCTION_DIRECTORY_NAME = "master"
+const BROKEN_BUILD = "broken"
+const PRODUCTION_URL = "https://akjaw.com/"
+
+const [ host, user, password ] = process.argv.slice(2)</code></pre><h4 id="dependencies">dependencies</h4><ul><li><strong>ftp-deploy</strong> is used for uploading the files to the FTP server. I tried to do it with other libraries, but this one offered me the most flexibility for this particular task.</li><li><strong>basic-ftp</strong> is used for listing renaming directories on the server, take a note that a global instance of its client is created.</li><li><strong>https</strong> is for checking if my website up (200 OK) after the deployment.</li></ul><h4 id="constants">constants</h4><ul><li><strong>LOCAL_BUILD_DIRECTORY</strong> - directory that is sent to the server.</li><li><strong>DEPLOY_DIRECTORY_NAME</strong> - name of the uploaded directory on the server.</li><li><strong>PRODUCTION_DIRECTORY_NAME</strong> - directory for the live site.</li><li><strong>BROKEN_BUILD</strong> - directory name for a build which doesn’t work.</li><li><strong>PRODUCTION_URL</strong> - the url for my site.</li></ul><p><strong>host</strong>, <strong>user</strong>, <strong>password</strong> correspond to the environment variables passed in through the command line</p><p>Here’s the function that directs the deployment flow:</p><pre><code class="language-javascript">function main() {
+  return uploadBuildDirectory()
+    .catch(error =&gt; onError("Upload", error))
+    .then(() =&gt; renameFtpDirectories())
+    .catch(error =&gt; onError("Rename", error))
+    .then(async backupDirectoryName =&gt; {
+      const isLive = await isProductionLive()
+      if(!isLive) return rollBackProduction(backupDirectoryName)
+    })
+    .catch(error =&gt; onError("Rollback", error))
+    .then(() =&gt; {
+      console.log("Deployment FINISHED")
+      basicFtpClient.close()
+      process.exit(0)
+    })
+}</code></pre><p>After every deployment step there is a catch block which stops the execution of the script, because a partially uploaded build or badly renamed folders can break the live site. Along with the script exit, the global ftp resource is also cleared. I’m not sure if this is necessary, but it’s better to be safe than sorry.</p><pre><code class="language-javascript">function onError(name, error){
+  console.log(`${name} FAILED`)
+  console.log(error)
+  fail()
+}
+
+function fail() {
+  basicFtpClient.close()
+  process.exit(1)
+}</code></pre><p><strong>process.exit</strong> takes in a number parameter which refers to the exit code. An exit code of 0 means that everything went fine, but a positive number means an error. In this case an exit code of 1 is an <a href="https://node.readthedocs.io/en/latest/api/process/?ref=akjaw.com" rel="noopener noreferrer">Uncaught Fatal Exception.</a></p><p>Here’s the break-down of the script flow without any errors:</p><pre>
+1. Upload the build directory to the FTP server
+2. Rename the current production directory and then the uploaded directory, at the end return the name of the old renamed production directory 
+3. Check if the new build works on production, if not, then rollback the changes by reversing the second step
+4. Finish the deployment by closing any resources and exiting with a normal exit code.
+</pre><h3 id="uploading-the-build-directory">Uploading the build directory</h3><pre><code class="language-javascript">function uploadBuildDirectory(){
+  const config = {
+    host,
+    user,
+    password,
+    localRoot: `./${LOCAL_BUILD_DIRECTORY}`,
+    remoteRoot: `./${DEPLOY_DIRECTORY_NAME}`,
+    include: ["*", "**/*"]
+  }
+
+  const ftpDeploy = new FtpDeploy()
+
+  ftpDeploy.on("uploading", data =&gt; {
+    const { totalFilesCount, transferredFileCount, filename } = data
+    console.log(`${transferredFileCount} out of ${totalFilesCount} ${filename}`)
+  })
+
+  ftpDeploy.on("upload-error", data =&gt; {
+    console.log(data.err)
+    throw new Error("Upload FAILED")
+  })
+
+  return ftpDeploy
+    .deploy(config)
+    .then(() =&gt; console.log(`Upload COMPLETED`))
+}</code></pre><p>All the heavy lifting is done by ftp-deploy, I only specify the credentials, directories and log some information about the files during the upload. Even If one file is not uploaded correctly it will probably break the site, so an error is thrown to stop the deployment.</p><h3 id="renaming-both-of-the-directories">Renaming both of the directories</h3><pre><code class="language-javascript">async function renameFtpDirectories(){
+  await basicFtpClient.access({ host, user, password })
+
+  const directories = await basicFtpClient.list(".")
+  const backupDirectoryName = createBackupDirectoryName(directories)
+  console.log(`Backup folder name: ${backupDirectoryName}`)
+
+  await basicFtpClient.rename(PRODUCTION_DIRECTORY_NAME, backupDirectoryName)
+  await basicFtpClient.rename(DEPLOY_DIRECTORY_NAME, PRODUCTION_DIRECTORY_NAME)
+  console.log("Renaming COMPLETED")
+
+  return backupDirectoryName
+}</code></pre><p>This function uses the global <strong>basicFtpClient</strong>, which is closed on any failure during the deployment flow. The only reason I made it global is to not overcomplicate the code and pass it as a parameter everywhere.</p><p>On my hosting, I keep the backups of all previous site versions, their directory name refers to their upload date in this format “YYYY.MM.DD”. But what happens if there is already a directory with that name? <strong>createBackupDirectoryName </strong>solves this issue:</p><pre><code class="language-javascript">function createBackupDirectoryName(directories) {
+  const productionDirectory = directories
+    .find(fileInfo =&gt; fileInfo.name === PRODUCTION_DIRECTORY_NAME)
+
+  const formattedDate = formatDate(productionDirectory.modifiedAt)
+
+  const numberOfDateOccurrences = directories
+    .filter(fileInfo =&gt; fileInfo.name.includes(formattedDate))
+    .length
+
+  if(numberOfDateOccurrences === 0){
+    return formattedDate
+  } else {
+    return `${formattedDate}_${numberOfDateOccurrences + 1}`
+  }
+}
+
+function formatDate(date) {
+  const month = date.getMonth() + 1
+  const paddedMonth = month.toString().padStart(2, "0")
+  const paddedDay = date.getDate().toString().padStart(2, "0")
+
+  return `${date.getFullYear()}.${paddedMonth}.${paddedDay}`
+}</code></pre><p>This function gets a list of all the directories on the FTP server as a parameter. To correctly make a backup of the production directory  I need its modification date. I use the find function to iterate the list and find the production directory, the modification date is then formatted to the correct format. A simple glimpse in the <strong>formatDate </strong>shows how intuitive it is to work with dates in plain JavaScript :). Once I have the correct directory name I need to check if there are already some directories with the same name/date. If this is the case, I add a postfix as to not overwrite anything.</p><p>The rest is as easy as swapping the production directory and returning the <strong>backupDirectoryName</strong> for the possible rollback:</p><pre><code class="language-javascript">await basicFtpClient.rename(PRODUCTION_DIRECTORY_NAME, backupDirectoryName)
+await basicFtpClient.rename(DEPLOY_DIRECTORY_NAME, PRODUCTION_DIRECTORY_NAME)
+console.log("Renaming COMPLETED")
+
+return backupDirectoryName</code></pre><h3 id="checking-the-production-website">Checking the production website</h3><p>Just to be sure everything went as planned, I check if my site is live:</p><pre><code class="language-js">...
+.then(async backupDirectoryName =&gt; {
+  const isLive = await isProductionLive()
+  if(!isLive) return rollBackProduction(backupDirectoryName)
+})
+...
+
+function isProductionLive() {
+  return new Promise((resolve) =&gt; {
+    https
+      .get(PRODUCTION_URL, res =&gt; {
+        console.log(`Production status code ${res.statusCode}`)
+        resolve(res.statusCode === 200)
+      })
+      .on("error", _ =&gt; {
+        resolve(false)
+      })
+  })
+}
+
+async function rollBackProduction(backupDirectoryName){
+  await basicFtpClient.rename(PRODUCTION_DIRECTORY_NAME, BROKEN_BUILD)
+  await basicFtpClient.rename(backupDirectoryName, PRODUCTION_DIRECTORY_NAME)
+  console.log(`Rollback COMPLETED`)
+  fail()
+}</code></pre><p>I simply connect to my website and check the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status?ref=akjaw.com" rel="noopener noreferrer">status code </a>it returns, if there are no errors it should be 200 OK. I know this is far from perfect, but at least it lets me sleep at night. If the website returns a different status code it might mean my server is down or something is wrong with the build. In either case I roll back the build by simply renaming the directories again. I also call the <strong>fail</strong> method to notify CircleCi that something went wrong.</p><h2 id="conclusion">Conclusion</h2><p>I know that my way of deployment is far from perfect, and that there are probably better ways of doing it. Nonetheless, I’m happy with the result and the experience I gained along the way. The first version of this post will be uploaded with CircleCi, then I will provide some screenshots from the panel.</p><figure class="kg-card kg-image-card kg-card-hascaption"><figcaption>Script logs in CircleCi</figcaption></figure><figure class="kg-card kg-image-card kg-card-hascaption"><figcaption>CircleCi workflow</figcaption></figure><p>As you can see this workflow takes quite a bit of time, but I don’t think I will ever exceed the free CircleCi limit with it. By my calculation I can have about 20+ deployments weekly, so even if I add some tests to the workflow, I still don’t have to worry about it.</p><h2 id="the-whole-script-or-a-gist-">The whole script or a <a href="https://gist.github.com/AKJAW/9d1f16c6d08f760cc2bc52b29577aeb5?ref=akjaw.com#file-ftp-deploy-js">gist</a>:</h2><pre><code class="language-js">const FtpDeploy = require("ftp-deploy")
+const ftp = require("basic-ftp")
+const basicFtpClient = new ftp.Client()
+const https = require('https');
+
+const LOCAL_BUILD_DIRECTORY = "public"
+const DEPLOY_DIRECTORY_NAME = "temp"
+const PRODUCTION_DIRECTORY_NAME = "master"
+const BROKEN_BUILD = "broken"
+const PRODUCTION_URL = "https://akjaw.com/"
+
+const [ host, user, password ] = process.argv.slice(2)
+
+function main() {
+
+  return uploadBuildDirectory()
+    .catch(error =&gt; onError("Upload", error))
+    .then(() =&gt; renameFtpDirectories())
+    .catch(error =&gt; onError("Rename", error))
+    .then(async backupDirectoryName =&gt; {
+      const isLive = await isProductionLive()
+      if(!isLive) return rollBackProduction(backupDirectoryName)
+    })
+    .catch(error =&gt; onError("Rollback", error))
+    .then(() =&gt; {
+      console.log("Deploy FINISHED")
+      basicFtpClient.close()
+      process.exit(0)
+    })
+}
+
+function uploadBuildDirectory(){
+  const config = {
+    host,
+    user,
+    password,
+    localRoot: `./${LOCAL_BUILD_DIRECTORY}`,
+    remoteRoot: `./${DEPLOY_DIRECTORY_NAME}`,
+    include: ["*", "**/*"]
+  }
+
+  const ftpDeploy = new FtpDeploy()
+
+  ftpDeploy.on("uploading", data =&gt; {
+    const { totalFilesCount, transferredFileCount, filename } = data
+    console.log(`${transferredFileCount} out of ${totalFilesCount} ${filename}`)
+  })
+
+  ftpDeploy.on("upload-error", data =&gt; {
+    console.log(data.err)
+    throw new Error("Upload FAILED")
+  })
+
+  return ftpDeploy
+    .deploy(config)
+    .then(() =&gt; console.log(`Upload COMPLETED`))
+}
+
+async function renameFtpDirectories(){
+  await basicFtpClient.access({ host, user, password })
+
+  const directories = await basicFtpClient.list(".")
+  const backupDirectoryName = createBackupDirectoryName(directories)
+  console.log(`Backup folder name: ${backupDirectoryName}`)
+
+  await basicFtpClient.rename(PRODUCTION_DIRECTORY_NAME, backupDirectoryName)
+  await basicFtpClient.rename(DEPLOY_DIRECTORY_NAME, PRODUCTION_DIRECTORY_NAME)
+  console.log("Renaming COMPLETED")
+
+  return backupDirectoryName
+}
+
+function createBackupDirectoryName(directories) {
+  const productionDirectory = directories
+    .find(fileInfo =&gt; fileInfo.name === PRODUCTION_DIRECTORY_NAME)
+
+  const formattedDate = formatDate(productionDirectory.modifiedAt)
+
+  const numberOfDateOccurrences = directories
+    .filter(fileInfo =&gt; fileInfo.name.includes(formattedDate))
+    .length
+
+  if(numberOfDateOccurrences === 0){
+    return formattedDate
+  } else {
+    return `${formattedDate}_${numberOfDateOccurrences + 1}`
+  }
+}
+
+function formatDate(date) {
+  const month = date.getMonth() + 1
+  const paddedMonth = month.toString().padStart(2, "0")
+  const paddedDay = date.getDate().toString().padStart(2, "0")
+
+  return `${date.getFullYear()}.${paddedMonth}.${paddedDay}`
+}
+
+function isProductionLive() {
+  return new Promise((resolve) =&gt; {
+    https
+      .get(PRODUCTION_URL, res =&gt; {
+        console.log(`Production status code ${res.statusCode}`)
+        resolve(res.statusCode === 200)
+      })
+      .on("error", _ =&gt; {
+        resolve(false)
+      })
+  })
+}
+
+async function rollBackProduction(backupDirectoryName){
+  await basicFtpClient.rename(PRODUCTION_DIRECTORY_NAME, BROKEN_BUILD)
+  await basicFtpClient.rename(backupDirectoryName, PRODUCTION_DIRECTORY_NAME)
+  console.log(`Rollback COMPLETED`)
+  fail()
+}
+
+function onError(name, error){
+  console.log(`${name} FAILED`)
+  console.log(error)
+  fail()
+}
+
+function fail() {
+  basicFtpClient.close()
+  process.exit(1)
+}
+
+main()</code></pre>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>

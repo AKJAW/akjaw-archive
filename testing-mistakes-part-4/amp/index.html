@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>21 Testing Mistakes - Part 4</title>
+
+    <meta name="description" content="The fourth part of my Testing Mistakes series">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/testing-mistakes-part-4/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="21 Testing Mistakes - Part 4">
+    <meta property="og:description" content="The fourth part of my Testing Mistakes series">
+    <meta property="og:url" content="https://akjaw.com/testing-mistakes-part-4/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2023/04/hero-part4-1.png">
+    <meta property="article:published_time" content="2023-04-07T06:25:14.000Z">
+    <meta property="article:modified_time" content="2025-05-06T11:30:43.000Z">
+    <meta property="article:tag" content="Testing">
+    <meta property="article:tag" content="Kotlin">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="21 Testing Mistakes - Part 4">
+    <meta name="twitter:description" content="The fourth part of my Testing Mistakes series">
+    <meta name="twitter:url" content="https://akjaw.com/testing-mistakes-part-4/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2023/04/hero-part4-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Testing, Kotlin">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="643">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "21 Testing Mistakes - Part 4",
+    "url": "https://akjaw.com/testing-mistakes-part-4/",
+    "datePublished": "2023-04-07T06:25:14.000Z",
+    "dateModified": "2025-05-06T11:30:43.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2023/04/hero-part4-1.png",
+        "width": 1200,
+        "height": 643
+    },
+    "keywords": "Testing, Kotlin",
+    "description": "The fourth part of my Testing Mistakes series",
+    "mainEntityOfPage": "https://akjaw.com/testing-mistakes-part-4/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">21 Testing Mistakes - Part 4</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2023-04-07">07 Apr 2023</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2023/04/hero-part4-1.png" width="600" height="340" layout="responsive" 
+                alt="21 Testing Mistakes - Part 4"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text">This part focuses on16. Ignoring mutation testing and not verifying if the tests are covering all cases17. Creating objects in every test instead of having object mothers18. Not using explicit data structures in tests, but referencing previously created ones19. Not caring about test code quality20. Always adding tests into only one file21. Ignoring test automation in the CI process</div></div><div class="kg-card kg-callout-card kg-callout-card-grey"><div class="kg-callout-emoji">🔗</div><div class="kg-callout-text"><a href="../../5-beginner-testing-mistakes-i-noticed-while-working-with-less-experienced-developers/">First part</a><a href="../../testing-mistakes-part-2/">Second part</a><a href="../../testing-mistakes-part-3/">Third part</a><a href="../../testing-mistakes-part-4/">Fourth part</a></div></div><h2 id="16-ignoring-mutation-testing-and-not-verifying-if-the-tests-are-covering-all-cases">16. Ignoring mutation testing and not verifying if the tests are covering all cases</h2><p>Sometimes when writing complex code, you want to make sure your tests cover every case. To do that, you follow the logic and verify that a test for this exists. This is good, but there is one additional thing you can do to make sure everything is tested: Mutation Testing.</p><p><strong>To perform Mutation Testing, all you need to do, is comment out some line or change some condition and then run your tests. If some test fails, then that logic / condition is tested. If everything passes, then it probably means that a test is missing for that chunk of code.</strong></p><p>Of course, don't go over board with this and check every line, you should probably focus on parts: </p><ul><li>That you're not sure are tested correctly</li><li>Complex logic that is hard to follow</li><li>Really important parts of the system</li></ul><p><strong>Applying Mutation testing will give you more confidence, that the SUT is correctly tested</strong> and that any regression will be caught by your Automated test suite.</p><h2 id="17-creating-objects-in-every-test-instead-of-having-object-mothers">17. Creating objects in every test instead of having object mothers</h2><p>This topic is point borrows from the helper functions section. Basically, instead of repeating the same instantiation / creation logic every time, you could create a helper function which creates it for you.</p><p><strong>These object mothers can create the SUT and its dependencies or data structures which the SUT uses. This way you increase re-usability and protect from code changes. </strong></p><p>Such helper functions also allow you to use default values, making the tests only pass in relevant parameters for that test, which makes them shorter and more explicit.</p><p>Here we have a class which we would like to test:</p><pre><code class="language-Kotlin">class SomeClass(
+    val database: Database,
+    val timestampProvider: TimestampProvider,
+    val someConverter: SomeConverter,
+) {
+    // ...
+}</code></pre><p>And an object mother for it:</p><pre><code class="language-kotlin">fun createSomeClass(
+    database: Database = FakeDatabase(),
+    timestampProvider: TimestampProvider = FakeTimestampProvider(),
+    someConverter: SomeConverter = SomeConverter(timestampProvider),
+): SomeClass {
+    return SomeClass(database, timestampProvider, someConverter)
+}</code></pre><p>This object mother provides for us with some default values, which we won't have to provide when using it.</p><pre><code class="language-kotlin">@Before
+fun setUp() {
+    systemUnderTest = createSomeClass(fakeDatabase, fakeTimestampProvider)
+}
+
+@Test
+fun hasCorrectInitialValue() {
+    assertEquals(true, systemUnderTest.isInitialized)
+}</code></pre><p>In most cases, you will probably want to pass in some dependencies from the test, so they can be verified. However, implementation details like "SomeConverter" can be ignored, because the object mother will pass it in. </p><p><strong>These types of object mother come in handy when you have to create this class in multiple tests, or you want to test instantiation logic by re-creating the SUT inside a test case.</strong></p><p>This type of function can also be used for data structures:</p><pre><code class="language-kotlin">data class AwkwardDataStructure(
+    val valueA: OtherStructure,
+    val valueB: OtherStructure,
+    val valueC: OtherStructure
+)
+
+data class OtherStructure(
+    val id: String,
+    val type: String,
+)
+
+fun createAwkwardDataStructure(
+    valueA: OtherStructure = OtherStructure("", ""),
+    valueB: OtherStructure = OtherStructure("", ""),
+    valueC: OtherStructure = OtherStructure("", ""),
+): AwkwardDataStructure 
+    return AwkwardDataStructure(valueA, valueB, valueC)
+}</code></pre><p><strong>Thanks to this function, we don't need to repeat so much boilerplate every time we create the awkward data structure</strong>. If a test only focuses on valueA, we just pass in valueA the other ones use the default values. This makes the test easier to understand, because we know to only focus on this one value.</p><h2 id="18-not-using-explicit-data-structures-in-tests-but-referencing-previously-created-ones">18. Not using explicit data structures in tests, but referencing previously created ones</h2><p><strong>Tests should explicitly tell you what they're focusing on, without having to hunt down the answer why the test behaved the way it did. Hiding the important values in a global variable will make the test harder to understand</strong>.</p><p>For examples sake, we have an SUT that takes in an Article Schema and based on its enum type returns a different article:</p><pre><code class="language-kotlin">enum class ArticleType {
+    Text,
+    Image,
+}
+
+data class ArticleSchema(
+    val headline: String,
+    val content: String,
+    val type: ArticleType,
+    val imageUrls: List&lt;String&gt;?,
+)
+
+data class TextArticle(
+    val headline: String,
+    val content: String,
+)
+
+data class ImageArticle(
+    val headline: String,
+    val content: String,
+    val imageUrls: List&lt;String&gt;,
+)</code></pre><p>The image schema property is nullable, so there might be a case, where we want an image article, but we don't have an image, then it should be converted to a normal text one. </p><p>Here's a test which has all the data structures prepared beforehand:</p><pre><code class="language-kotlin">private val TEXT_ARTICLE_SCHEMA =
+    ArticleSchema("Text", "Content", ArticleType.Text, null)
+private val IMAGE_ARTICLE_SCHEMA =
+    ArticleSchema("Image", "Content", ArticleType.Image, listOf("url"))
+private val IMAGE_ARTICLE_WITHOUT_URLS_SCHEMA =
+    ArticleSchema("Image", "Content", ArticleType.Image, null)
+
+private val TEXT_ARTICLE =
+    TextArticle("Text", "Content")
+private val IMAGE_ARTICLE =
+    ImageArticle("Image", "Content", listOf("url"))
+private val TEXT_ARTICLE_FROM_IMAGE_ARTICLE =
+    TextArticle("Image", "Content")
+
+@Test
+fun `Article Schema with text type results in TextArticle`() {
+    val result = systemUnderTest.convert(TEXT_ARTICLE_SCHEMA)
+
+    assertEquals(result, TEXT_ARTICLE)
+}
+
+@Test
+fun `Article Schema with image type results in ImageArticle`() {
+    val result = systemUnderTest.convert(IMAGE_ARTICLE_SCHEMA)
+
+    assertEquals(result, IMAGE_ARTICLE)
+}
+
+@Test
+fun `Article Schema with image type but no urls results in TextArticle`() {
+    val result = systemUnderTest.convert(IMAGE_ARTICLE_WITHOUT_URLS_SCHEMA)
+
+    assertEquals(result, TEXT_ARTICLE_FROM_IMAGE_ARTICLE)
+}</code></pre><p><strong>Using the already defined data structure in every test makes the tests shorter, however in order to understand them we have to look at the data structure definitions</strong>. Additionally, if we have an edge case (like image without URLs) we need to also hunt down what variable which is responsible for that behavior.</p><p>A better approach would be to create the data structure in the test and only specify what is relevant for that test:</p><pre><code class="language-kotlin">@Test
+fun `Article Schema with text type results in TextArticle`() {
+    val schema = createSchema("Text", "Content", ArticleType.Text)
+
+    val result = systemUnderTest.convert(schema)
+
+    assertEquals(result, TextArticle("Text", "Content"))
+}
+
+@Test
+fun `Article Schema with image type results in ImageArticle`() {
+    val schema = createSchema("Image", "Content", ArticleType.Image, listOf("url"))
+
+    val result = systemUnderTest.convert(schema)
+
+    assertEquals(result, ImageArticle("Image", "Content", listOf("url")))
+}
+
+@Test
+fun `Article Schema with image type but no urls results in TextArticle`() {
+    val schema = createSchema("Image", "Content", ArticleType.Image, null)
+
+    val result = systemUnderTest.convert(schema)
+
+    assertEquals(result, TextArticle("Image", "Content"))
+}
+
+private fun createSchema(
+    headline: String,
+    content: String,
+    type: ArticleType,
+    imageUrls: List&lt;String&gt;? = null,
+): ArticleSchema {
+    return ArticleSchema(headline, content, type, imageUrls)
+}</code></pre><p>This makes the tests a little longer, but a lot more straight forward. To help with repetitions, a parameterized test case could be created and to improve the readability additional string values could be extracted and maybe even more helper functions.</p><p><strong>Generally, the more relevant information we have in the test body, the easier it should be to understand what's going on. However, too much information will obfuscate it, try to find a middle ground of verbosity and readability.</strong></p><h2 id="19-not-caring-about-test-code-quality">19. Not caring about test code quality</h2><p><strong>A lot of the times, test code is neglected, which makes it "rot", with time such rot will make the tests hard to change in order to fit the production code. Failing tests will be removed, and new tests won't be added. This causes our automated test suite to be a lot less reliable, and with time it can cause us a lot of issues.</strong></p><p>To avoid this, it is important that you clean up / refactor your test code from time to time just as you would production code. Clean tests are easy to fix, understand and maintain, which in the long run speeds up our development because regressions are caught a lot faster.</p><p><strong>Just like with writing tests, it is an up-front investment, because writing tests is extra code. In the long run, these tests are a lot better at caching errors than humans are. They be executed in a fraction of what manual testing can achieve.</strong></p><p> Keep your tests clean because:</p><ul><li>hard to understand tests will be hard to fix</li><li>hard to fix tests will be probably removed</li><li>without tests, more and more bugs will land in production</li><li>fixing these bugs will slow down development</li></ul><h2 id="20-always-adding-tests-into-only-one-file">20. Always adding tests into only one file</h2><p>Sometimes a class starts small, but more and more logic is added to it. If the class is not split up, or it doesn't make sense to do so, then tests will grow with it, but in a much faster rate.</p><p>This will result in a test file that has over 500 lines of code, which might seem good, because all edge cases are covered. However, <strong>big files are hard to reason about, they might have a lot of set-up or helper functions which are only used in a portion of tests. </strong></p><p>To help with this, instead of having one a 1:1 relation for test file and SUT, <strong>you can split out the test classes and group them by relevant logic. If some group of tests only focus on one behavior, then it's a good candidate for a separate file.</strong></p><p>Take for example an SUT which manages comments with the following data structure:</p><pre><code class="language-kotlin">data class Comment(
+    val text: String,
+    val postDateIso: String = "",
+    val upVotes: Int = 0,
+    val downVotes: Int = 0,
+    val wasReported: Boolean = false,
+)</code></pre><p>The system can vote, report, sort and also parses the text from HTML. The test could look like this:</p><pre><code class="language-kotlin">class CommentsTest {
+    
+    @Test fun `Comment content is correctly parsed from HTML`() { /**/ }
+    @Test fun `Up voting a neutral comment increases upVotes`() { /**/ }
+    @Test fun `Up voting an up voted comment does not update votes`() { /**/ }
+    @Test fun `Up voting a down voted comment reduces downVotes and increases upVotes`() { /**/ }
+    @Test fun `Down voting a neutral comment increases upVotes`() { /**/ }
+    @Test fun `Down voting an down voted comment does not update votes`() { /**/ }
+    @Test fun `Down voting an up voted comment reduces upVotes and increases downVotes`() { /**/ }
+    @Test fun `Initially comment is not reported`() { /**/ }
+    @Test fun `Reporting comment sets the correct flag`() { /**/ }
+    @Test fun `Sorting comments by newest works correctly`() { /**/ }
+    @Test fun `Sorting comments by oldest works correctly`() { /**/ }
+    @Test fun `Sorting comments by up votes works correctly`() { /**/ }
+    @Test fun `Sorting comments by down votes works correctly`() { /**/ }
+    // more tests....
+    
+    private fun setUpParsing() { /**/ }
+    private fun setUpVoting() { /**/ }
+    private fun setUpReporting() { /**/ }
+    private fun setUpSorting() { /**/ }
+}</code></pre><p>That's a lot of tests for a lot of edge cases, just by looking at their names we can see that they are grouped by functionality however they are still in one file which can grow exponentially and become really hard to manage. </p><p>A better approach would be to extract these tests to specific test files:</p><pre><code class="language-kotlin">class CommentsVotingTest {
+
+    @Test fun `Up voting a neutral comment increases upVotes`() { /**/ }
+    @Test fun `Up voting an up voted comment does not update votes`() { /**/ }
+    @Test fun `Up voting a down voted comment reduces downVotes and increases upVotes`() { /**/ }
+    @Test fun `Down voting a neutral comment increases upVotes`() { /**/ }
+    @Test fun `Down voting an down voted comment does not update votes`() { /**/ }
+    @Test fun `Down voting an up voted comment reduces upVotes and increases downVotes`() { /**/ }
+
+    private fun setUpVoting() { /**/ }
+}
+
+class CommentsSortingTest {
+
+    @Test fun `Sorting comments by newest works correctly`() { /**/ }
+    @Test fun `Sorting comments by oldest works correctly`() { /**/ }
+    @Test fun `Sorting comments by up votes works correctly`() { /**/ }
+    @Test fun `Sorting comments by down votes works correctly`() { /**/ }
+
+    private fun setUpSorting() { /**/ }
+}
+
+class CommentsMiscellaneousTest {
+
+    @Test fun `Comment content is correctly parsed from HTML`() { /**/ }
+    @Test fun `Initially comment is not reported`() { /**/ }
+    @Test fun `Reporting comment sets the correct flag`() { /**/ }
+    // more tests....
+
+    private fun setUpParsing() { /**/ }
+    private fun setUpReporting() { /**/ }
+}</code></pre><p><strong>This way, all the behavior specific set-up or helper functions are only present in that test file, which makes the other tests files smaller and easier to reason about.</strong> For behaviors which have only a small amount of tests, and they can't be sensibly grouped, they could stay in the original file which I usually name a MiscellaneousTest.</p><p>If you want to change something with sorting, you will probably only need to look into the Sorting test, which is smaller, and only focused on that behavior. The only problem with this approach is the tests, which are in the "Miscellaneous" are harder to find. However, this is only an issue, because the other tests are so nicely grouped.</p><p>* An SUT object mother should be used for these test files to avoid repeating the same boilerplate.</p><h2 id="21-ignoring-test-automation-in-the-ci-process">21. Ignoring test automation in the CI process</h2><p>Sometimes we want to introduce a quick change to our project and forget to run our test suit. If the PR is approved, and we don't have any test automation, we will probably merge it. <strong>Sometimes these quick changes introduce bugs, and without automation it is really easy to introduce bugs to our main branch</strong>.</p><p><strong>Tests should be run as often as possible to ensure that nothing is broken, we can't only rely on our human memory to remember about them</strong>. They should run automatically on every change we want to introduce to our codebase.</p><p>This is where a Code Review CI/CD process comes in handy, anytime we want to merge something to the main branch, the CI will run our tests and if nothing breaks it will allow us to merge the change. However, if we introduce a regression, the CI will let us know and hopefully block us from merging until we fix the issue.</p><p><strong>The CI is an important tool in modern development, it helps us with eliminating the human error (i.e. forgetfulness) part of software development.</strong></p>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>

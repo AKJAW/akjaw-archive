@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>GitHub Actions Reducing Duplication / Boilerplate</title>
+
+    <meta name="description" content="YAML files, which are not that easy to maintain, changes are usually copied and pasted across multiple files. This article shows that there&#x27;s a better way.">
+    <link rel="icon" href="../../content/images/size/w256h256/2023/03/favicon-transparent.png" type="image/png">
+    <link rel="canonical" href="https://akjaw.com/github-actions-reducing-duplication-boilerplate/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="AKJAW">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="GitHub Actions Reducing Duplication / Boilerplate">
+    <meta property="og:description" content="YAML files, which are not that easy to maintain, changes are usually copied and pasted across multiple files. This article shows that there&#x27;s a better way.">
+    <meta property="og:url" content="https://akjaw.com/github-actions-reducing-duplication-boilerplate/">
+    <meta property="og:image" content="https://akjaw.com/content/images/2023/09/github-actions-reducing-duplication.png">
+    <meta property="article:published_time" content="2023-09-09T07:34:34.000Z">
+    <meta property="article:modified_time" content="2023-09-09T14:41:05.000Z">
+    <meta property="article:tag" content="GitHub Actions">
+    <meta property="article:tag" content="CI/CD">
+    <meta property="article:tag" content="Multiplatform">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GitHub Actions Reducing Duplication / Boilerplate">
+    <meta name="twitter:description" content="YAML files, which are not that easy to maintain, changes are usually copied and pasted across multiple files. This article shows that there&#x27;s a better way.">
+    <meta name="twitter:url" content="https://akjaw.com/github-actions-reducing-duplication-boilerplate/">
+    <meta name="twitter:image" content="https://akjaw.com/content/images/2023/09/github-actions-reducing-duplication.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Aleksander Jaworski">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="GitHub Actions, CI/CD, Multiplatform">
+    <meta name="twitter:site" content="@akjaw1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="500">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "AKJAW",
+        "url": "https://akjaw.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/03/logo-black-transparent-1.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Aleksander Jaworski",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://akjaw.com/content/images/2023/09/Avatar-2.jpg",
+            "width": 642,
+            "height": 645
+        },
+        "url": "https://akjaw.com/author/aleksander/",
+        "sameAs": []
+    },
+    "headline": "GitHub Actions Reducing Duplication / Boilerplate",
+    "url": "https://akjaw.com/github-actions-reducing-duplication-boilerplate/",
+    "datePublished": "2023-09-09T07:34:34.000Z",
+    "dateModified": "2023-09-09T14:41:05.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://akjaw.com/content/images/2023/09/github-actions-reducing-duplication.png",
+        "width": 1200,
+        "height": 500
+    },
+    "keywords": "GitHub Actions, CI/CD, Multiplatform",
+    "description": "YAML files, which are not that easy to maintain, changes are usually copied and pasted across multiple files. This article shows that there&#x27;s a better way.",
+    "mainEntityOfPage": "https://akjaw.com/github-actions-reducing-duplication-boilerplate/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.82">
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+    
+    amp-youtube {
+        height: calc(100vw / 1.78);
+        width: 100vw;
+        position: relative;
+    }
+
+    amp-youtube img {
+        position: absolute;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content blockquote.kg-blockquote-alt {
+        font-size: 1.2em;
+        font-style: italic;
+        line-height: 1.6em;
+        text-align: center;
+        color: #738a94;
+        padding: 0.75em 3em 1.25em;
+    }
+
+    .post-content blockquote.kg-blockquote-alt::before {
+        display: none;
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-toggle-card-icon {
+        display: none;
+    }
+
+    .kg-toggle-content {
+        margin-top: 0.8rem;
+    }
+
+    .kg-product-card-container {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgb(124 139 154 / 25%);
+    }
+
+    .kg-product-card-description p {
+        margin-top: 1.5em;
+    }
+
+    .kg-product-card-description ul {
+        margin-left: 24px;
+    }
+
+    .kg-product-card-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    .kg-product-card-rating-star {
+        height: 28px;
+        width: 20px;
+        margin-right: 2px;
+    }
+
+    .kg-product-card-rating-star svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    opacity: 0.15;
+    }
+
+    .kg-product-card-rating-active.kg-product-card-rating-star svg {
+    opacity: 1;
+    }
+
+    .kg-nft-card-container {
+        position: relative;
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        text-decoration: none;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.4rem;
+        font-weight: 400;
+        box-shadow: 0 2px 6px -2px rgb(0 0 0 / 10%), 0 0 1px rgb(0 0 0 / 40%);
+        width: 100%;
+        max-width: 512px;
+        color: #15212A;
+        background: #fff;
+        border-radius: 5px;
+        transition: none;
+        margin: 0 auto;
+    }
+
+    .kg-nft-metadata {
+        padding: 2.0rem;
+    }
+
+    .kg-nft-image-container {
+        position: relative;
+    }
+
+    .kg-nft-image {
+        display: flex;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .kg-nft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .kg-nft-header h4.kg-nft-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0;
+        color: #15212A;
+    }
+
+    .kg-nft-header amp-img {
+        max-width: 114px;
+        max-height: 26px;
+    }
+
+    .kg-nft-opensea-logo {
+        margin-top: 2px;
+        width: 100px;
+    }
+
+    .kg-nft-creator {
+        font-family: inherit;
+        color: #95A1AD;
+    }
+
+    .kg-nft-creator span {
+        font-weight: 500;
+        color: #15212A;
+    }
+
+    .kg-nft-card p.kg-nft-description {
+        font-size: 1.4rem;
+        line-height: 1.4em;
+        margin: 2.0rem 0 0;
+        color: #222;
+    }
+
+    .kg-button-card {
+        display: flex;
+        position: static;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .kg-btn {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 2.0rem;
+        height: 4.0rem;
+        line-height: 4.0rem;
+        font-size: 1.65rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .kg-btn:hover {
+        opacity: 0.85;
+    }
+
+    .kg-btn-accent {
+        background-color: var(--ghost-accent-color, #1292EE);
+        color: #fff;
+    }
+
+    .kg-callout-card {
+        display: flex;
+        padding: 20px 28px;
+        border-radius: 3px;
+    }
+
+    .kg-callout-card-grey {
+        background: rgba(124, 139, 154, 0.13);
+    }
+
+    .kg-callout-card-white {
+        background: transparent;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-callout-card-blue {
+        background: rgba(33, 172, 232, 0.12);
+    }
+
+    .kg-callout-card-green {
+        background: rgba(52, 183, 67, 0.12);
+    }
+
+    .kg-callout-card-yellow {
+        background: rgba(240, 165, 15, 0.13);
+    }
+
+    .kg-callout-card-red {
+        background: rgba(209, 46, 46, 0.11);
+    }
+
+    .kg-callout-card-pink {
+        background: rgba(225, 71, 174, 0.11);
+    }
+
+    .kg-callout-card-purple {
+        background: rgba(135, 85, 236, 0.12);
+    }
+
+    .kg-callout-card-accent {
+        background: var(--ghost-accent-color);
+        color: #fff;
+    }
+
+    .kg-callout-card-accent a {
+        color: #fff;
+    }
+
+    .kg-callout-emoji {
+        padding-right: 16px;
+        line-height: 1.3;
+        font-size: 1.25em;
+    }
+
+    .kg-header-card {
+        padding: 6em 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .kg-header-card.kg-size-small {
+        padding-top: 4em;
+        padding-bottom: 4em;
+    }
+
+    .kg-header-card.kg-size-large {
+        padding-top: 12em;
+        padding-bottom: 12em;
+    }
+
+    .kg-header-card.kg-width-full {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+
+    .kg-header-card.kg-align-left {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kg-header-card.kg-style-dark {
+        background: #15171a;
+        color: #ffffff;
+    }
+
+    .kg-header-card.kg-style-light {
+        color: #15171a;
+        border: 1px solid rgba(124, 139, 154, 0.25);
+        border-width: 1px 0;
+    }
+
+    .kg-header-card.kg-style-accent {
+        background-color: var(--ghost-accent-color);
+    }
+
+    .kg-header-card.kg-style-image {
+        background-color: #e7e7eb;
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .kg-header-card h2 {
+        font-size: 4em;
+        font-weight: 700;
+        line-height: 1.1em;
+        margin: 0;
+    }
+
+    .kg-header-card h2 strong {
+        font-weight: 800;
+    }
+
+    .kg-header-card.kg-size-small h2 {
+        font-size: 3em;
+    }
+
+    .kg-header-card.kg-size-large h2 {
+        font-size: 5em;
+    }
+
+    .kg-header-card h3 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 1.3em;
+        margin: 0;
+    }
+
+    .kg-header-card h3 strong {
+        font-weight: 600;
+    }
+
+    .kg-header-card.kg-size-small h3 {
+        font-size: 1em;
+    }
+
+    .kg-header-card.kg-size-large h3 {
+        font-size: 1.5em;
+    }
+
+    .kg-header-card:not(.kg-style-light) h2,
+    .kg-header-card:not(.kg-style-light) h3 {
+        color: #ffffff;
+    }
+
+    .kg-header-card a.kg-header-card-button {
+        display: flex;
+        position: static;
+        align-items: center;
+        padding: 0 1.2em;
+        height: 2.4em;
+        line-height: 1em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: opacity 0.2s ease-in-out;
+        background-color: var(--ghost-accent-color);
+        color: #ffffff;
+        margin: 1.75em 0 0;
+    }
+
+    .kg-header-card a.kg-header-card-button:hover {
+        opacity: 0.85;
+    }
+
+    .kg-header-card.kg-size-large a.kg-header-card-button {
+        margin-top: 2em;
+    }
+
+    .kg-header-card.kg-size-small a.kg-header-card-button {
+        margin-top: 1.5em;
+    }
+
+    .kg-header-card.kg-style-image a.kg-header-card-button,
+    .kg-header-card.kg-style-dark a.kg-header-card-button {
+        background: #ffffff;
+        color: #15171a;
+    }
+
+    .kg-header-card.kg-style-accent a.kg-header-card-button {
+        background: #ffffff;
+        color: var(--ghost-accent-color);
+    }
+
+    .kg-audio-card {
+        display: flex;
+        width: 100%;
+        box-shadow: inset 0 0 0 1px rgba(124, 139, 154, 0.25);
+    }
+
+    .kg-audio-thumbnail {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+        background: transparent;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kg-audio-thumbnail.placeholder {
+        background: var(--ghost-accent-color);
+    }
+
+    .kg-audio-thumbnail.placeholder svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+    }
+
+    .kg-audio-player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        --seek-before-width: 0%;
+        --volume-before-width: 100%;
+        --buffered-width: 0%;
+    }
+
+    .kg-audio-title {
+        width: 100%;
+        padding: 8px 12px 0;
+        border: none;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-weight: 700;
+        background: transparent;
+    }
+
+    .kg-audio-player {
+        display: none;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #526e8b;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../">
+                <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">GitHub Actions Reducing Duplication / Boilerplate</h1>
+                <section class="post-meta">
+                    Aleksander Jaworski -
+                    <time class="post-date" datetime="2023-09-09">09 Sep 2023</time>
+                </section>
+            </header>
+            <figure class="post-image">
+                <amp-img src="/content/images/2023/09/github-actions-reducing-duplication.png" width="600" height="340" layout="responsive" 
+                alt="GitHub Actions Reducing Duplication / Boilerplate"
+                ></amp-img>
+            </figure>
+            <section class="post-content">
+
+                <p>In my <a href="../../kotlin-multiplatform-github-actions-ci-verification-labels/">previous article</a>, I've shown how to set up a CI for a Kotlin Multiplatform repository. In this post, I'll focus on how to remove GitHub Actions boilerplate. </p>
+<div class="kg-card kg-callout-card kg-callout-card-yellow"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text"><p><span>If you don't use Kotlin Multiplatform, or even Kotlin, don't worry. The main focus of this article is platform-agnostic (YAML and bash). It touches on topics like extracting logic, composite actions, adding job variables.</span></p></div></div>
+<p>The CI verification consists of building the project and running tests on: the main branch and PRs. However, for PRs depending on what label the PR has only selected targets will be run, which saves time and costs (for paid plans).</p>
+<p>The repository (which is a Kotlin Multiplatform project for Android, Desktop and iOS) used in this article is available in this repository:</p>
+<figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/AKJAW/kotlin-multiplatform-github-actions?ref=akjaw.com"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - AKJAW/kotlin-multiplatform-github-actions: Repository showcasing GitHub Actions for Kotlin Multiplatform</div><div class="kg-bookmark-description">Repository showcasing GitHub Actions for Kotlin Multiplatform - GitHub - AKJAW/kotlin-multiplatform-github-actions: Repository showcasing GitHub Actions for Kotlin Multiplatform</div><div class="kg-bookmark-metadata"><amp-img class="kg-bookmark-icon" src="https://github.com/fluidicon.png" alt="" width="512" height="512" layout="responsive"></amp-img><span class="kg-bookmark-author">AKJAW</span><span class="kg-bookmark-publisher">GitHub</span></div></div><div class="kg-bookmark-thumbnail"><amp-img src="https://opengraph.githubassets.com/ac51c56168b74c053100bb6e48d7ce08df72b1a24c0ad229e6b5339c7f3abc3c/AKJAW/kotlin-multiplatform-github-actions" alt="" width="1200" height="600" layout="responsive"></amp-img></div></a></figure>
+<h2 id="the-workflows">The Workflows</h2>
+<p>Without going into the implementation details of what is called where, here's a broad overview of the workflow structure:</p>
+<figure class="kg-card kg-code-card"><pre><code class="language-yaml">name: Code review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+    branches:
+      - main
+
+jobs:
+  Build:
+    uses: ./.github/workflows/build.yml
+
+  UnitTests:
+    uses: ./.github/workflows/test.yml
+
+  AllowMerge:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [ Build, UnitTests ]
+    steps:
+      - run: |
+          if [ ${{ github.event_name }} == pull_request ] &amp;&amp; [ ${{ join(github.event.pull_request.labels.*.name) == '' }} == true ]; then
+            exit 1
+          elif [ ${{ (contains(needs.Build.result, 'failure')) }} == true ] || [ ${{ (contains(needs.UnitTests.result, 'failure')) }} == true ]; then
+            exit 1
+          else
+            exit 0
+          fi</code></pre><figcaption><p><span>The Code Review workflow</span></p></figcaption></figure>
+<p>This is the main workflow which will be called by GitHub directly. It calls two other workflows that run the builds and tests. The last job is used for the GitHub PR status check, which fails if there is no PR label or when any of the Build / Tests jobs fail (which is needed because GitHub treats skipped jobs as failed).</p>
+<p>This workflow doesn't really contain any repetition / boilerplate which can be improved. The problems lie in the two "sub-workflows" (Don't worry, you don't need to read the whole things):</p>
+<figure class="kg-card kg-code-card"><pre><code class="language-yaml">name: Build
+
+on:
+  workflow_call:
+
+jobs:
+  Android:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Android'))) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11"
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - run: ./gradlew :androidApp:assemble
+
+  Desktop:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Desktop'))) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11"
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - run: ./gradlew :desktopApp:assemble
+
+  iOS:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'iOS'))) }}
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11"
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - run: ./gradlew :shared:generateDummyFramework
+
+      - name: Set up cocoapods
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: latest
+
+      - name: Install Dependencies
+        run: |
+          cd iosApp
+          pod install --verbose
+
+      - run: xcodebuild build -workspace iosApp/iosApp.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose</code></pre><figcaption><p><span>The Build workflow</span></p></figcaption></figure>
+<p>The basic idea is as follows for both the Builds and UnitTests workflows. The jobs should only run when</p>
+<ul><li>Started manually through <em>workflow_dispatch</em></li><li>From a push on the main branch</li><li>When a PR is opened or pushed to (It's important that the PR is not a draft as to not waste billing minutes)</li></ul>
+<p>Additionally, PR labels control for which platforms the jobs will run:</p>
+<figure class="kg-card kg-image-card"></figure>
+<p>For example, if the PR changes are only for the Android codebase, then the PR should have the Android label. The KMP label should be used when the shared codebase changes and because it is used by all platforms, all jobs should be run.</p>
+<h3 id="boilerplate">Boilerplate</h3>
+<p>In this article I'll only focus on the Build workflow, however the same steps should be applied to the UnitTests workflow, as both of them have the following boilerplate:</p>
+<ul><li>All of the above jobs have the same two set-up steps<ul><li>Java</li><li>Gradle</li></ul></li><li>Repeated if statements<ul><li>For the GitHub event (<em>workflow_dispatch</em>, <em>push</em>, <em>pull_request</em>)</li><li>For the PR label (<em>github.event.pull_request.labels.*.name</em>)</li></ul></li></ul>
+<h2 id="extracting-steps-to-a-separate-file">Extracting steps to a separate file</h2>
+<p>Steps can be moved to a <a href="https://docs.github.com/en/actions/creating-actions/creating-a-composite-action?ref=akjaw.com">composite </a>action, which can be then re-used multiple times across all jobs.</p>
+<p>The Java and Gradle composite action could look like this:</p>
+<figure class="kg-card kg-code-card"><pre><code class="language-yaml">name: Job set up
+description: Sets up Java and Gradle
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: "11"
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2</code></pre><figcaption><p><span>job-set-up/action.yaml</span></p></figcaption></figure>
+<p>The name of the composite action becomes the name of the parent folder, which in this case is <strong><em>job-set-up</em></strong>.</p>
+<p>And then it can be re-used in all the jobs like this:</p>
+<pre><code class="language-yaml">Android:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &amp;&amp; github.event.pull_request.draft == false &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Android'))) }}
+  runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Job set up
+      uses: ./.github/actions/job-set-up
+
+    - run: ./gradlew :androidApp:assemble</code></pre>
+<div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text"><p><span>Thanks to this extraction, whenever the set-up changes, only one file will need to be changed instead of going through all the jobs in all the workflows.</span></p></div></div>
+<h2 id="extracting-the-github-event-condition">Extracting the GitHub event condition</h2>
+<p>As shown previously, the if statement is pretty complex, which leads to it being hard to understand. To make the matter worse, it is scattered through all the jobs, making it hard to change. </p>
+<p>As we all know, developers are lazy creatures, instead of changing all of them separately, they'll for sure copy and paste the if statement, which will sooner or later lead to bugs and typos.</p>
+<div class="kg-card kg-callout-card kg-callout-card-red"><div class="kg-callout-text"><p><span>Unfortunately, if statements for jobs cannot be extracted to composite actions, so a different approach is needed.</span></p></div></div>
+<p>What can be done is to move the if statement to an additional job that runs before Build and UnitTests workflows:</p>
+<pre><code class="language-yaml"># ...
+
+jobs:
+  SetUp:
+    runs-on: ubuntu-latest
+    steps:
+      - id: setVariables
+        name: Set variables
+        run: |
+          if [ ${{ github.event_name }} == workflow_dispatch ] || [ ${{ github.event_name }} == push ] || ([ ${{ github.event_name }} == pull_request ] &amp;&amp; [ ${{ github.event.pull_request.draft }} == false ]); then
+            exit 0
+          else
+            exit 1
+          fi
+
+  Build:
+    needs: SetUp
+    uses: ./.github/workflows/build.yml
+
+  UnitTests:
+    needs: SetUp
+    uses: ./.github/workflows/test.yml
+</code></pre>
+<p>The <strong>SetUp</strong> job checks if the workflow was started in the right conditions, if yes then it completes successfully, allowing the <strong>Build</strong> and <strong>UnitTests</strong> workflows to start. Otherwise, <strong>SetUp</strong> fails, causing <strong>Build</strong> and <strong>UnitTests</strong> to also fail, thus reducing the duplication inside the workflows while behaving in the same way.</p>
+<p>Here's what the Android build job looks after this change:</p>
+<pre><code class="language-yaml">Android:
+  if: ${{ github.event_name != 'pull_request' || (github.event_name == 'pull_request' &amp;&amp; (contains(github.event.pull_request.labels.*.name, 'KMP') || contains(github.event.pull_request.labels.*.name, 'Android'))) }}
+  # ...</code></pre>
+<p>The if statement is better but still complex, the first condition (<em>!= 'pull_request'</em>) is required because without it, manual or main branch runs would always result in skipped jobs, but for PRs, the labels are checked just like before. </p>
+<div class="kg-card kg-callout-card kg-callout-card-yellow"><div class="kg-callout-emoji">💡</div><div class="kg-callout-text"><p><span>Remember to always double-check that condition changes didn't break other types of workflow runs.</span></p></div></div>
+<h3 id="reducing-label-boilerplate">Reducing Label Boilerplate</h3>
+<div class="kg-card kg-callout-card kg-callout-card-yellow"><div class="kg-callout-text"><p><span>The below example only shows the Android build job, but please note that these changes affect all the jobs, but were just omitted for brevity.</span></p></div></div>
+<p>The previous if statement was the same for all jobs, however label logic differs between jobs. This means that the if statement cannot be completely removed, however it can be improved using some bash logic and by <a href="https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs?ref=akjaw.com">passing variables between jobs</a>:</p>
+<pre><code class="language-yaml"># ...
+
+jobs:
+  SetUp:
+    runs-on: ubuntu-latest
+    steps:
+      - id: setVariables
+        name: Set variables
+        run: |
+          echo "shouldRunKmp=${{ contains(github.event.pull_request.labels.*.name, 'KMP') }}" &gt;&gt; "$GITHUB_OUTPUT"
+          echo "shouldRunAndroid=${{ contains(github.event.pull_request.labels.*.name, 'Android') }}" &gt;&gt; "$GITHUB_OUTPUT"
+          # ...
+    outputs:
+      shouldRunKmp: ${{ steps.setVariables.outputs.shouldRunKmp }}
+      shouldRunAndroid: ${{ steps.setVariables.outputs.shouldRunAndroid }}
+      
+  Build:
+    needs: SetUp
+    uses: ./.github/workflows/build.yml
+    with:
+      shouldRunKmp: ${{ needs.SetUp.outputs.shouldRunKmp }}
+      shouldRunAndroid: ${{ needs.SetUp.outputs.shouldRunAndroid }}</code></pre>
+<p>The above set-up logic reads the PR labels and passes them to other jobs, which can be used like this:</p>
+<pre><code>name: Build
+
+on:
+  workflow_call:
+    inputs:
+      shouldRunKmp:
+        required: true
+        type: string
+      shouldRunAndroid:
+        required: true
+        type: string
+      # ...
+
+jobs:
+  Android:
+    if: ${{ github.event_name != 'pull_request' || (github.event_name == 'pull_request' &amp;&amp; (inputs.shouldRunKmp == 'true' || inputs.shouldRunAndroid == 'true')) }}
+    # ...</code></pre>
+<p>This improves the if statement, but it can still be improved further. The <strong>SetUp </strong>job already has an early return based on the <em>event_name</em>, but here it is duplicated. Instead of duplicating it, the logic can be included as part of the output variables logic:</p>
+<pre><code class="language-yaml">SetUp:
+  runs-on: ubuntu-latest
+  steps:
+    - id: setVariables
+      name: Set variables
+      run: |
+        isFromMain=${{ github.ref == 'refs/heads/main' }}
+        isManual=${{ github.event_name == 'workflow_dispatch' }}
+        hasKmpLabel=${{ contains(github.event.pull_request.labels.*.name, 'KMP') }}
+        shouldRunKmp=false
+        if $isFromMain || $isManual || $hasKmpLabel ; then
+          shouldRunKmp=true
+        fi
+        echo "shouldRunKmp=$shouldRunKmp" &gt;&gt; "$GITHUB_OUTPUT"
+        echo "shouldRunAndroid=${{ contains(github.event.pull_request.labels.*.name, 'Android') }}" &gt;&gt; "$GITHUB_OUTPUT"
+        # ...
+  outputs:
+    shouldRunKmp: ${{ steps.setVariables.outputs.shouldRunKmp }}
+    shouldRunAndroid: ${{ steps.setVariables.outputs.shouldRunAndroid }}</code></pre>
+<p>In case the PR run on the main branch or started manually, the <strong>shouldRunKmp</strong> is set to true, meaning that all jobs will be started, and for PRs, the labels decide what is run.  This change, reduces the job if statements to just using the input variables:</p>
+<pre><code class="language-yaml">jobs:
+  Android:
+    if: ${{ inputs.shouldRunKmp == 'true' || inputs.shouldRunAndroid == 'true' }}
+  # ...</code></pre>
+<div class="kg-card kg-callout-card kg-callout-card-green"><div class="kg-callout-text"><p><span>With this change, most of the logic resides in the SetUp job, which makes it easier to understand and also eliminates copy and paste errors. In the future, if the conditions change, probably only the SetUp job will need to change and all other jobs will remain unchanged.</span></p></div></div>
+<h2 id="workflow-reusability">Workflow Reusability</h2>
+<p>As you may have noticed, the Build and UnitTests workflows were specified as separate workflows using <a href="https://docs.github.com/en/actions/using-workflows/reusing-workflows?ref=akjaw.com"><strong>workflow_call</strong></a>. Thanks to this, they can be used in other workflows.</p>
+<p>For example, if the project had a nightly verification, both of these workflows could be re-used to make sure that nothing broke the main branch. Please note, that with the above logic, the nightly would need to pass in the correct variables for the jobs to run (Or just the KMP one).</p>
+<h2 id="summary">Summary</h2>
+<ul><li><strong>Composite actions</strong> - help with repeated steps, like common set-up logic</li><li><strong>Set-up jobs</strong> - can contain early returns for workflow starts in the wrong conditions</li><li><strong>Output variables</strong> - can be used to reduce the number of conditions in jobs</li><li><strong>Reusable workflows</strong> - can be re-used across multiple workflows, eliminating copying and pasting logic throughout different files</li></ul>
+<p>All the changes discussed in this article can be seen in <a href="https://github.com/AKJAW/kotlin-multiplatform-github-actions/pull/8/files?ref=akjaw.com">this PR</a>.</p>
+<h3 id="course">Course</h3>
+<p>If you found this helpful, you might be interested in the Android Next Level course I'm a co-author of. It goes more in-depth into CI/CD for Android, e.g. Code Review, Manual builds for testers, Release builds, Nightly verification and more. Currently, the course is only available in Polish, but there is a waitlist for those interested in an English version of it, so feel free to check it out if you're interested!</p>
+<figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="../../android-next-level/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Android Next Level</div><div class="kg-bookmark-description">A course about processes outside of coding like: CI/CD, scaling your project, good git hygiene or how to cooperate with your teammates</div><div class="kg-bookmark-metadata"><span class="kg-bookmark-author">Aleksander Jaworski</span><span class="kg-bookmark-publisher">AKJAW</span></div></div><div class="kg-bookmark-thumbnail"></div></a></figure>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="/content/images/2023/03/favicon-transparent.png" width="50" height="50" layout="fixed" alt="AKJAW"></amp-img>
+        <h3>AKJAW</h3>
+            <p>A technical blog for Android, Kotlin Multiplatform and Testing by Aleksander Jaworski</p>
+        <p><a href="../../">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>
