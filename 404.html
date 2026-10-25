@@ -400,13 +400,8 @@
 		
 		<script src="/assets/js/app.bundle.min.js?v=d178ef2a53"></script>
         <script>
-$(document).ready(function() {
-    $('a').each(function() {
-       var a = new RegExp('/' + window.location.host + '/');
-       if(!a.test(this.href)) {
-           $(this).attr("target","_blank")
-       }
-    });
+document.querySelectorAll('a[href]').forEach(function(a) {
+    if (a.host && a.host !== window.location.host) a.target = '_blank';
 });
 </script>
 
